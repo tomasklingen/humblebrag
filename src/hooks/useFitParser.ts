@@ -43,7 +43,7 @@ export function useFitParser(file: File | null): UseFitParserResult {
 			}
 		}
 
-		parseFile()
+		void parseFile()
 
 		return () => {
 			cancelled = true

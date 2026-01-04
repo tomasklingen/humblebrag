@@ -1,6 +1,6 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
-	"plugins": ["unicorn", "typescript", "oxc"],
+	"plugins": ["unicorn", "typescript", "oxc", "react", "react-perf", "promise"],
 	"categories": {},
 	"rules": {
 		"constructor-super": "warn",
@@ -69,6 +69,7 @@
 		"oxc/number-arg-out-of-range": "warn",
 		"oxc/only-used-in-recursion": "warn",
 		"oxc/uninvoked-array-callback": "warn",
+
 		"typescript/await-thenable": "warn",
 		"typescript/no-array-delete": "warn",
 		"typescript/no-base-to-string": "warn",
@@ -94,6 +95,33 @@
 		"typescript/restrict-template-expressions": "warn",
 		"typescript/triple-slash-reference": "warn",
 		"typescript/unbound-method": "warn",
+		"typescript/no-confusing-void-expression": "error",
+		"typescript/no-misused-promises": "error",
+		"typescript/no-mixed-enums": "error",
+		"typescript/no-unnecessary-boolean-literal-compare": "error",
+		"typescript/no-unnecessary-template-expression": "error",
+		"typescript/no-unnecessary-type-arguments": "error",
+		"typescript/no-unnecessary-type-assertion": "error",
+		"typescript/no-unsafe-argument": "error",
+		"typescript/no-unsafe-assignment": "error",
+		"typescript/no-unsafe-call": "error",
+		"typescript/no-unsafe-enum-comparison": "error",
+		"typescript/no-unsafe-member-access": "error",
+		"typescript/no-unsafe-return": "error",
+		"typescript/no-unsafe-type-assertion": "error",
+		"typescript/non-nullable-type-assertion-style": "error",
+		"typescript/only-throw-error": "error",
+		"typescript/prefer-promise-reject-errors": "error",
+		"typescript/prefer-reduce-type-parameter": "error",
+		"typescript/prefer-return-this-type": "error",
+		"typescript/promise-function-async": "error",
+		"typescript/related-getter-setter-pairs": "error",
+		"typescript/require-await": "error",
+		"typescript/restrict-plus-operands": "error",
+		"typescript/return-await": "error",
+		"typescript/switch-exhaustiveness-check": "error",
+		"typescript/use-unknown-in-catch-callback-variable": "error",
+
 		"unicorn/no-await-in-promise-methods": "warn",
 		"unicorn/no-empty-file": "warn",
 		"unicorn/no-invalid-fetch-options": "warn",
@@ -106,21 +134,21 @@
 		"unicorn/no-useless-length-check": "warn",
 		"unicorn/no-useless-spread": "warn",
 		"unicorn/prefer-set-size": "warn",
-		"unicorn/prefer-string-starts-ends-with": "warn"
+		"unicorn/prefer-string-starts-ends-with": "warn",
 	},
 	"settings": {
 		"jsx-a11y": {
 			"polymorphicPropName": null,
 			"components": {},
-			"attributes": {}
+			"attributes": {},
 		},
 		"next": {
-			"rootDir": []
+			"rootDir": [],
 		},
 		"react": {
 			"formComponents": [],
 			"linkComponents": [],
-			"version": null
+			"version": null,
 		},
 		"jsdoc": {
 			"ignorePrivate": false,
@@ -130,15 +158,15 @@
 			"augmentsExtendsReplacesDocs": false,
 			"implementsReplacesDocs": false,
 			"exemptDestructuredRootsFromChecks": false,
-			"tagNamePreference": {}
+			"tagNamePreference": {},
 		},
 		"vitest": {
-			"typecheck": false
-		}
+			"typecheck": false,
+		},
 	},
 	"env": {
-		"builtin": true
+		"builtin": true,
 	},
 	"globals": {},
-	"ignorePatterns": []
+	"ignorePatterns": [],
 }
