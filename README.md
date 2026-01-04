@@ -25,6 +25,7 @@ Upload a FIT file from your cycling workout and get a shareable infographic with
 - Recharts for visualization
 - html-to-image for export
 - fit-file-parser for FIT file parsing
+- oxlint + oxfmt for fast linting & formatting
 
 ## Development
 
@@ -34,13 +35,21 @@ npm run dev
 ```
 
 Build for production:
+
 ```bash
 npm run build
 ```
 
 Lint:
+
 ```bash
 npm run lint
+```
+
+Format code:
+
+```bash
+npm run format
 ```
 
 ## Usage
@@ -52,6 +61,7 @@ npm run lint
 ## Getting FIT Files
 
 FIT files can be exported from:
+
 - Garmin Connect
 - Strava (export original file)
 - Wahoo apps

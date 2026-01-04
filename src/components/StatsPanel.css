@@ -1,84 +1,84 @@
 .stats-panel {
-  padding: 2rem;
+	padding: 2rem;
 }
 
 .stats-header {
-  margin-bottom: 2rem;
-  text-align: center;
+	margin-bottom: 2rem;
+	text-align: center;
 }
 
 .stats-header h2 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.75rem;
-  font-weight: 700;
+	margin: 0 0 0.5rem 0;
+	font-size: 1.75rem;
+	font-weight: 700;
 }
 
 .workout-date {
-  margin: 0;
-  color: var(--color-text-secondary, #94a3b8);
-  font-size: 0.875rem;
+	margin: 0;
+	color: var(--color-text-secondary, #94a3b8);
+	font-size: 0.875rem;
 }
 
 .workout-type {
-  margin: 0.25rem 0 0 0;
-  color: var(--color-text-muted, #64748b);
-  font-size: 0.875rem;
-  text-transform: capitalize;
+	margin: 0.25rem 0 0 0;
+	color: var(--color-text-muted, #64748b);
+	font-size: 0.875rem;
+	text-transform: capitalize;
 }
 
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1.5rem;
-  max-width: 600px;
-  margin: 0 auto;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	gap: 1.5rem;
+	max-width: 600px;
+	margin: 0 auto;
 }
 
 .stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem;
-  background: var(--color-surface-light, #334155);
-  border-radius: 8px;
-  transition: transform 0.2s ease;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1rem;
+	background: var(--color-surface-light, #334155);
+	border-radius: 8px;
+	transition: transform 0.2s ease;
 }
 
 .stat-item:hover {
-  transform: translateY(-2px);
+	transform: translateY(-2px);
 }
 
 .stat-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-accent, #fbbf24);
-  margin-bottom: 0.25rem;
-  line-height: 1;
+	font-size: 2rem;
+	font-weight: 700;
+	color: var(--color-accent, #fbbf24);
+	margin-bottom: 0.25rem;
+	line-height: 1;
 }
 
 .stat-label {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary, #94a3b8);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  text-align: center;
+	font-size: 0.75rem;
+	color: var(--color-text-secondary, #94a3b8);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	text-align: center;
 }
 
 @media (max-width: 768px) {
-  .stats-panel {
-    padding: 1.5rem;
-  }
+	.stats-panel {
+		padding: 1.5rem;
+	}
 
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
+	.stats-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
+	}
 
-  .stat-value {
-    font-size: 1.5rem;
-  }
+	.stat-value {
+		font-size: 1.5rem;
+	}
 
-  .stat-label {
-    font-size: 0.7rem;
-  }
+	.stat-label {
+		font-size: 0.7rem;
+	}
 }
