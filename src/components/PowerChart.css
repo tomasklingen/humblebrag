@@ -1,0 +1,31 @@
+.chart-container {
+  padding: 2rem;
+  background: var(--color-surface, #1e293b);
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+.chart-container h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text, #f1f5f9);
+}
+
+.no-data {
+  padding: 3rem;
+  text-align: center;
+  color: var(--color-text-muted, #64748b);
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 1rem;
+  }
+
+  .chart-container h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+}
