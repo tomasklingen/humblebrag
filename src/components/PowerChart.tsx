@@ -64,7 +64,10 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 	if (powerRecords.length === 0) {
 		return (
 			<div className="chart-container">
-				<h3>Power</h3>
+				<div className="chart-header">
+					<div className="chart-header-accent" />
+					<h3>Power</h3>
+				</div>
 				<div className="no-data">No power data available</div>
 			</div>
 		)
@@ -107,7 +110,10 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 
 	return (
 		<div className="chart-container">
-			<h3>Power (W){hasHeartRate ? " / Heart Rate (bpm)" : ""}</h3>
+			<div className="chart-header">
+				<div className="chart-header-accent" />
+				<h3>Power (W){hasHeartRate ? " / Heart Rate (bpm)" : ""}</h3>
+			</div>
 			<ResponsiveContainer width="100%" height={300}>
 				<LineChart
 					data={chartData}
@@ -119,16 +125,29 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							<stop offset="100%" stopColor="#f97316" stopOpacity={0.1} />
 						</linearGradient>
 					</defs>
-					<CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+					<CartesianGrid strokeDasharray="3 3" stroke="rgba(30, 41, 59, 0.5)" />
 					<XAxis
 						dataKey={xKey}
 						label={{
-							value: useDistance ? "Distance (km)" : "Time (min)",
+							value: useDistance ? "DISTANCE (KM)" : "TIME (MIN)",
 							position: "insideBottom",
 							offset: -5,
+							style: {
+								fill: "#334155",
+								fontSize: "0.6rem",
+								fontWeight: 700,
+								fontFamily: "Helvetica Neue, Arial, sans-serif",
+								letterSpacing: "0.15em",
+							},
 						}}
-						stroke="#94a3b8"
-						tick={{ fill: "#94a3b8" }}
+						stroke="rgba(51, 65, 85, 0.4)"
+						tick={{
+							fill: "#475569",
+							fontSize: "0.625rem",
+							fontWeight: 600,
+							fontFamily: "Helvetica Neue, Arial, sans-serif",
+						}}
+						tickLine={false}
 						{...(customTicks
 							? { type: "number" as const, ticks: customTicks, domain: [xMin, xMax] }
 							: {})}
@@ -136,26 +155,63 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 					<YAxis
 						yAxisId="power"
 						domain={[0, yAxisMax]}
-						label={{ value: "Power (W)", angle: -90, position: "insideLeft" }}
-						stroke="#94a3b8"
-						tick={{ fill: "#94a3b8" }}
+						label={{
+							value: "POWER (W)",
+							angle: -90,
+							position: "insideLeft",
+							style: {
+								fill: "#334155",
+								fontSize: "0.6rem",
+								fontWeight: 700,
+								fontFamily: "Helvetica Neue, Arial, sans-serif",
+								letterSpacing: "0.15em",
+							},
+						}}
+						stroke="rgba(51, 65, 85, 0.4)"
+						tick={{
+							fill: "#475569",
+							fontSize: "0.625rem",
+							fontWeight: 600,
+							fontFamily: "Helvetica Neue, Arial, sans-serif",
+						}}
+						tickLine={false}
 					/>
 					{hasHeartRate && (
 						<YAxis
 							yAxisId="hr"
 							orientation="right"
 							domain={[0, hrAxisMax]}
-							label={{ value: "HR (bpm)", angle: 90, position: "insideRight" }}
-							stroke="#ef4444"
-							tick={{ fill: "#ef4444" }}
+							label={{
+								value: "HR (BPM)",
+								angle: 90,
+								position: "insideRight",
+								style: {
+									fill: "rgba(239, 68, 68, 0.3)",
+									fontSize: "0.6rem",
+									fontWeight: 700,
+									fontFamily: "Helvetica Neue, Arial, sans-serif",
+									letterSpacing: "0.15em",
+								},
+							}}
+							stroke="rgba(51, 65, 85, 0.4)"
+							tick={{
+								fill: "rgba(239, 68, 68, 0.4)",
+								fontSize: "0.625rem",
+								fontWeight: 600,
+								fontFamily: "Helvetica Neue, Arial, sans-serif",
+							}}
+							tickLine={false}
 						/>
 					)}
 					<Tooltip
 						contentStyle={{
-							backgroundColor: "#1e293b",
-							border: "1px solid #334155",
-							borderRadius: "8px",
-							color: "#f1f5f9",
+							backgroundColor: "#0f172a",
+							border: "1px solid #1e293b",
+							borderRadius: "0",
+							color: "#94a3b8",
+							fontFamily: "Helvetica Neue, Arial, sans-serif",
+							fontSize: "0.75rem",
+							fontWeight: 600,
 						}}
 						formatter={(value: number | undefined, name?: string) => {
 							if (name === "heartRate") {

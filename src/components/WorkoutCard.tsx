@@ -14,14 +14,16 @@ export const WorkoutCard = forwardRef<HTMLDivElement, WorkoutCardProps>(
 		return (
 			<div ref={ref} className="workout-card">
 				<div className="workout-card-header">
-					<h1>Humblebrag</h1>
+					<span className="header-brand">HUMBLEBRAG</span>
 				</div>
 
 				<StatsPanel data={data} settings={settings} />
 				<PowerChart records={data.records} settings={settings} />
 
 				<div className="workout-card-footer">
-					<p>Made with Humblebrag</p>
+					<span className="footer-text">HUMBLEBRAG</span>
+					<span className="footer-dot" />
+					<span className="footer-text footer-text-muted">EST. 2026</span>
 				</div>
 			</div>
 		)
