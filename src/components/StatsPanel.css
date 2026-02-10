@@ -1,102 +1,164 @@
 .stats-panel {
-	padding: 2.5rem 2rem 2rem;
+	padding: 3rem 2.5rem 2rem;
 }
 
 .stats-header {
-	margin-bottom: 2rem;
-	text-align: center;
+	margin-bottom: 2.5rem;
 }
 
-.workout-title {
+.header-top {
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 0.75rem;
-	margin-bottom: 0.5rem;
-}
-
-.stats-header h2 {
-	margin: 0;
-	font-size: 2rem;
-	font-weight: 800;
-	background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-	letter-spacing: -0.02em;
-}
-
-.workout-type {
-	display: inline-block;
-	padding: 0.25rem 0.75rem;
-	background: rgba(249, 115, 22, 0.15);
-	border: 1px solid rgba(249, 115, 22, 0.3);
-	border-radius: 12px;
-	color: #fbbf24;
-	font-size: 0.75rem;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-}
-
-.workout-date {
-	margin: 0;
-	color: var(--color-text-secondary, #94a3b8);
-	font-size: 0.875rem;
-	font-weight: 500;
-}
-
-/* Primary stats - hero section */
-.stats-primary {
-	display: flex;
-	justify-content: center;
-	gap: 3rem;
+	justify-content: space-between;
+	align-items: flex-end;
+	gap: 1.5rem;
 	margin-bottom: 2rem;
-	padding: 2rem 0;
-	border-bottom: 2px solid rgba(249, 115, 22, 0.2);
 }
 
-.stat-primary {
+.sport-badge {
+	flex: 1;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	gap: 0.25rem;
 }
 
-.stat-value-large {
-	font-size: 3rem;
-	font-weight: 900;
+.sport-name {
+	font-family: var(--font-display);
+	font-size: var(--text-display);
+	font-weight: var(--weight-black);
+	letter-spacing: var(--tracking-tight);
+	line-height: 0.9;
+	color: var(--color-text);
+	text-transform: uppercase;
+}
+
+.sport-sub {
+	font-family: var(--font-display);
+	font-size: var(--text-caption);
+	font-weight: var(--weight-bold);
+	letter-spacing: var(--tracking-wider);
+	color: var(--color-primary);
+	text-transform: uppercase;
+	margin-top: 0.5rem;
+}
+
+.date-vertical {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0;
+}
+
+.date-line {
+	font-family: var(--font-display);
+	font-size: var(--text-caption);
+	font-weight: var(--weight-bold);
+	letter-spacing: var(--tracking-wider);
+	color: var(--color-border);
+	text-transform: uppercase;
+	line-height: 1.4;
+}
+
+.date-day {
+	font-size: var(--text-title);
+	font-weight: var(--weight-black);
+	color: var(--color-text);
+	letter-spacing: -0.03em;
+	line-height: 0.9;
+	margin: 0.125rem 0;
+}
+
+/* Classification */
+.workout-classification {
+	display: flex;
+	align-items: center;
+	gap: 0.875rem;
+	padding: 0;
+}
+
+.classification-emoji {
+	font-size: 1.75rem;
 	line-height: 1;
-	background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-	letter-spacing: -0.02em;
+	filter: url(#emoji-solid-orange);
+	opacity: 0.5;
+}
+
+.classification-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+}
+
+.classification-type {
+	font-family: var(--font-display);
+	font-size: var(--text-caption);
+	font-weight: var(--weight-extrabold);
+	color: var(--color-primary);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wider);
+}
+
+.classification-description {
+	font-family: var(--font-display);
+	font-size: var(--text-body);
+	font-weight: var(--weight-medium);
+	color: var(--color-border);
+	line-height: 1.4;
+	font-style: italic;
+}
+
+/* Primary stats */
+.stats-primary {
+	display: flex;
+	gap: 0;
+	margin-bottom: 2rem;
+	border-bottom: 1px solid var(--color-surface);
+	padding-bottom: 2rem;
+}
+
+.stat-primary {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem 0.5rem;
+}
+
+.stat-value-large {
+	font-family: var(--font-display);
+	font-size: var(--text-hero);
+	font-weight: var(--weight-black);
+	line-height: 1;
+	color: var(--color-text);
+	letter-spacing: var(--tracking-tight);
 }
 
 .stat-label-large {
-	font-size: 0.75rem;
-	font-weight: 700;
-	color: var(--color-text-secondary, #94a3b8);
+	font-family: var(--font-display);
+	font-size: var(--text-caption);
+	font-weight: var(--weight-bold);
+	color: var(--color-border);
 	text-transform: uppercase;
-	letter-spacing: 0.1em;
+	letter-spacing: 0.25em;
+	margin-top: 0.625rem;
 }
 
 .stat-unit {
-	font-size: 0.65rem;
-	font-weight: 600;
-	color: var(--color-text-muted, #64748b);
+	font-family: var(--font-display);
+	font-size: var(--text-caption);
+	font-weight: var(--weight-semibold);
+	color: var(--color-text-ghost);
 	text-transform: lowercase;
-	margin-top: -0.25rem;
+	letter-spacing: var(--tracking-normal);
+	margin-top: 0.125rem;
 }
 
 /* Secondary stats grid */
 .stats-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-	gap: 1rem;
-	max-width: 700px;
-	margin: 0 auto;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 0;
 }
 
 .stat-item {
@@ -104,34 +166,26 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 1rem 0.75rem;
-	background: linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%);
-	border: 1px solid rgba(249, 115, 22, 0.15);
-	border-radius: 12px;
-	transition: all 0.2s ease;
-	min-height: 70px;
-}
-
-.stat-item:hover {
-	background: linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, rgba(251, 191, 36, 0.08) 100%);
-	border-color: rgba(249, 115, 22, 0.3);
-	transform: translateY(-2px);
+	padding: 1.25rem 0.5rem;
 }
 
 .stat-label {
-	font-size: 0.7rem;
-	font-weight: 600;
-	color: var(--color-text-secondary, #94a3b8);
+	font-family: var(--font-display);
+	font-size: var(--text-caption);
+	font-weight: var(--weight-bold);
+	color: var(--color-text-ghost);
 	text-transform: uppercase;
-	letter-spacing: 0.05em;
+	letter-spacing: var(--tracking-wide);
 	margin-bottom: 0.5rem;
 }
 
 .stat-value {
-	font-size: 1.5rem;
-	font-weight: 800;
-	color: var(--color-text, #f1f5f9);
+	font-family: var(--font-display);
+	font-size: var(--text-stat);
+	font-weight: var(--weight-black);
+	color: var(--color-text-secondary);
 	line-height: 1;
+	letter-spacing: var(--tracking-snug);
 }
 
 @media (max-width: 768px) {
@@ -139,43 +193,43 @@
 		padding: 2rem 1.5rem 1.5rem;
 	}
 
-	.stats-header h2 {
-		font-size: 1.5rem;
+	.header-top {
+		flex-direction: column;
+		align-items: flex-start;
 	}
 
-	.workout-title {
-		flex-direction: column;
+	.sport-name {
+		font-size: var(--text-title);
+	}
+
+	.date-vertical {
+		flex-direction: row;
+		align-items: baseline;
 		gap: 0.5rem;
 	}
 
-	.stats-primary {
-		gap: 2rem;
-		padding: 1.5rem 0;
+	.date-day {
+		font-size: 1.5rem;
+		margin: 0;
+	}
+
+	.classification-emoji {
+		font-size: 1.5rem;
 	}
 
 	.stat-value-large {
-		font-size: 2.25rem;
+		font-size: 2rem;
 	}
 
 	.stat-label-large {
-		font-size: 0.65rem;
+		font-size: 0.5rem;
 	}
 
 	.stats-grid {
 		grid-template-columns: repeat(2, 1fr);
-		gap: 0.75rem;
-	}
-
-	.stat-item {
-		padding: 0.875rem 0.5rem;
-		min-height: 60px;
 	}
 
 	.stat-value {
-		font-size: 1.25rem;
-	}
-
-	.stat-label {
-		font-size: 0.65rem;
+		font-size: 1.125rem;
 	}
 }

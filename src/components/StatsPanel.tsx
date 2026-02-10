@@ -34,14 +34,40 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 		return subSport
 	}
 
+	const classification = powerMetrics.classification
+
 	return (
 		<div className="stats-panel">
+			{/* SVG filter to render emoji as solid orange silhouette */}
+			<svg width="0" height="0" style={{ position: "absolute" }}>
+				<defs>
+					<filter id="emoji-solid-orange">
+						<feFlood floodColor="#f97316" result="flood" />
+						<feComposite in="flood" in2="SourceGraphic" operator="in" />
+					</filter>
+				</defs>
+			</svg>
 			<div className="stats-header">
-				<div className="workout-title">
-					<h2>{data.sport.charAt(0).toUpperCase() + data.sport.slice(1)}</h2>
-					{data.subSport && <span className="workout-type">{formatSubSport(data.subSport)}</span>}
+				<div className="header-top">
+					<div className="sport-badge">
+						<div className="sport-name">{data.sport.toUpperCase()}</div>
+						{data.subSport && <div className="sport-sub">{formatSubSport(data.subSport)}</div>}
+					</div>
+					<div className="date-vertical">
+						<div className="date-line">{format(data.date, "MMM")}</div>
+						<div className="date-line date-day">{format(data.date, "dd")}</div>
+						<div className="date-line">{format(data.date, "yyyy")}</div>
+					</div>
 				</div>
-				<p className="workout-date">{format(data.date, "MMM d, yyyy • h:mm a")}</p>
+				{isAdvancedMode && (
+					<div className="workout-classification">
+						<span className="classification-emoji">{classification.emoji}</span>
+						<div className="classification-content">
+							<div className="classification-type">{classification.type}</div>
+							<div className="classification-description">{classification.description}</div>
+						</div>
+					</div>
+				)}
 			</div>
 
 			<div className="stats-primary">
