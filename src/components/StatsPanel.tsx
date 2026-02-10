@@ -65,6 +65,10 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 			{isAdvancedMode ? (
 				<div className="stats-grid">
 					<div className="stat-item">
+						<div className="stat-label">1min Power</div>
+						<div className="stat-value">{powerMetrics.bestPower1min}W</div>
+					</div>
+					<div className="stat-item">
 						<div className="stat-label">5min Power</div>
 						<div className="stat-value">{powerMetrics.bestPower5min}W</div>
 					</div>

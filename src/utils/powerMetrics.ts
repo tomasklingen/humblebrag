@@ -9,6 +9,7 @@ export interface PowerMetrics {
 	intensityFactor: number // IF - ratio of NP to FTP
 	trainingStressScore: number // TSS - training load metric
 	variabilityIndex: number // VI - ratio of NP to average power (1.0 = perfectly steady)
+	bestPower1min: number // Best 1-minute average power
 	bestPower5min: number // Best 5-minute average power
 	bestPower20min: number // Best 20-minute average power (FTP estimate)
 	workKJ: number // Total work in kilojoules
@@ -110,6 +111,7 @@ export function computePowerMetrics(
 			: 0
 	const variabilityIndex = avgPower > 0 ? normalizedPower / avgPower : 0
 
+	const bestPower1min = computeBestAvgPower(records, 60) // 1 minute = 60 seconds
 	const bestPower5min = computeBestAvgPower(records, 300) // 5 minutes = 300 seconds
 	const bestPower20min = computeBestAvgPower(records, 1200) // 20 minutes = 1200 seconds
 
@@ -121,6 +123,7 @@ export function computePowerMetrics(
 		intensityFactor: Number(intensityFactor.toFixed(2)),
 		trainingStressScore: Math.round(trainingStressScore),
 		variabilityIndex: Number(variabilityIndex.toFixed(2)),
+		bestPower1min: Math.round(bestPower1min),
 		bestPower5min: Math.round(bestPower5min),
 		bestPower20min: Math.round(bestPower20min),
 		workKJ: Math.round(workKJ),
