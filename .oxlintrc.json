@@ -1,10 +1,19 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"env": {
+		"browser": true
+	},
 	"categories": {
 		"correctness": "error",
 		"suspicious": "warn",
 		"nursery": "warn",
-		"perf": "warn",
-		"pedantic": "warn"
+		"perf": "warn"
+	},
+	"rules": {
+		"max-lines-per-function": "off",
+		"unicorn/consistent-function-scoping": "off",
+		"unicorn/no-array-sort": "off",
+		"no-negated-condition": "off",
+		"preserve-caught-error": "off"
 	}
 }

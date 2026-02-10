@@ -82,13 +82,17 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 						<div className="segment-buttons">
 							<button
 								className={settings.statsDisplayMode === "basic" ? "active" : ""}
-								onClick={() => onChange({ ...settings, statsDisplayMode: "basic" })}
+								onClick={() => {
+									onChange({ ...settings, statsDisplayMode: "basic" })
+								}}
 							>
 								Basic
 							</button>
 							<button
 								className={settings.statsDisplayMode === "advanced" ? "active" : ""}
-								onClick={() => onChange({ ...settings, statsDisplayMode: "advanced" })}
+								onClick={() => {
+									onChange({ ...settings, statsDisplayMode: "advanced" })
+								}}
 							>
 								Advanced
 							</button>
@@ -102,9 +106,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 							step={1}
 							placeholder="0"
 							value={settings.functionalThresholdPower || ""}
-							onChange={(e) =>
+							onChange={(e) => {
 								onChange({ ...settings, functionalThresholdPower: Number(e.target.value) || 0 })
-							}
+							}}
 							className="customizer-input"
 						/>
 						<span className="segment-unit">W</span>
@@ -120,7 +124,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 							<input
 								type="checkbox"
 								checked={settings.showHeartRate}
-								onChange={(e) => onChange({ ...settings, showHeartRate: e.target.checked })}
+								onChange={(e) => {
+									onChange({ ...settings, showHeartRate: e.target.checked })
+								}}
 							/>
 							<span className="toggle-track">
 								<span className="toggle-thumb" />
@@ -133,7 +139,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 							<input
 								type="checkbox"
 								checked={settings.showTargetPower}
-								onChange={(e) => onChange({ ...settings, showTargetPower: e.target.checked })}
+								onChange={(e) => {
+									onChange({ ...settings, showTargetPower: e.target.checked })
+								}}
 							/>
 							<span className="toggle-track">
 								<span className="toggle-thumb" />
@@ -151,7 +159,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 						<input
 							type="checkbox"
 							checked={settings.smoothData}
-							onChange={(e) => onChange({ ...settings, smoothData: e.target.checked })}
+							onChange={(e) => {
+								onChange({ ...settings, smoothData: e.target.checked })
+							}}
 						/>
 						<span className="toggle-track">
 							<span className="toggle-thumb" />
@@ -162,7 +172,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 						<input
 							type="checkbox"
 							checked={settings.removeZeroPower}
-							onChange={(e) => onChange({ ...settings, removeZeroPower: e.target.checked })}
+							onChange={(e) => {
+								onChange({ ...settings, removeZeroPower: e.target.checked })
+							}}
 						/>
 						<span className="toggle-track">
 							<span className="toggle-thumb" />
@@ -174,7 +186,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 							<input
 								type="checkbox"
 								checked={settings.removeZeroHeartRate}
-								onChange={(e) => onChange({ ...settings, removeZeroHeartRate: e.target.checked })}
+								onChange={(e) => {
+									onChange({ ...settings, removeZeroHeartRate: e.target.checked })
+								}}
 							/>
 							<span className="toggle-track">
 								<span className="toggle-thumb" />
@@ -194,13 +208,17 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 							<div className="segment-buttons">
 								<button
 									className={settings.xAxisMode === "time" ? "active" : ""}
-									onClick={() => handleXAxisModeChange("time")}
+									onClick={() => {
+										handleXAxisModeChange("time")
+									}}
 								>
 									Time
 								</button>
 								<button
 									className={settings.xAxisMode === "distance" ? "active" : ""}
-									onClick={() => handleXAxisModeChange("distance")}
+									onClick={() => {
+										handleXAxisModeChange("distance")
+									}}
 								>
 									Distance
 								</button>

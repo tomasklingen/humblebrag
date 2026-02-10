@@ -16,7 +16,9 @@ export function ExportButton({ onClick }: ExportButtonProps) {
 		try {
 			await onClick()
 			setSuccess(true)
-			setTimeout(() => setSuccess(false), 2000)
+			setTimeout(() => {
+				setSuccess(false)
+			}, 2000)
 		} catch (error) {
 			console.error("Export failed:", error)
 			alert("Failed to export image. Please try again.")
@@ -28,7 +30,9 @@ export function ExportButton({ onClick }: ExportButtonProps) {
 	return (
 		<button
 			className={`export-button ${exporting ? "exporting" : ""} ${success ? "success" : ""}`}
-			onClick={handleClick}
+			onClick={() => {
+				void handleClick()
+			}}
 			disabled={exporting}
 		>
 			{exporting ? (

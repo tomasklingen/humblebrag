@@ -61,7 +61,7 @@ export function FileUpload({ onFileSelect, loading, error }: FileUploadProps) {
 	return (
 		<div className="file-upload-container">
 			<div
-				className={`file-upload-zone ${dragOver ? "drag-over" : ""} ${loading ? "loading" : ""}`}
+				className={`file-upload-zone ${dragOver ? "drag-over" : ""} ${loading === true ? "loading" : ""}`}
 				onDragOver={handleDragOver}
 				onDragLeave={handleDragLeave}
 				onDrop={handleDrop}
@@ -75,7 +75,7 @@ export function FileUpload({ onFileSelect, loading, error }: FileUploadProps) {
 					style={{ display: "none" }}
 				/>
 
-				{loading ? (
+				{loading === true ? (
 					<div className="upload-content">
 						<div className="spinner"></div>
 						<p>Parsing FIT file...</p>
@@ -104,7 +104,7 @@ export function FileUpload({ onFileSelect, loading, error }: FileUploadProps) {
 				)}
 			</div>
 
-			{error && (
+			{error !== null && error !== undefined && error !== "" && (
 				<div className="error-message">
 					<strong>Error:</strong> {error}
 				</div>
