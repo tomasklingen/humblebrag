@@ -1,12 +1,13 @@
 import { format } from "date-fns"
-import type { WorkoutData } from "../types/workout"
+import type { CardSettings, WorkoutData } from "../types/workout"
 import "./StatsPanel.css"
 
 interface StatsPanelProps {
 	data: WorkoutData
+	settings: CardSettings
 }
 
-export function StatsPanel({ data }: StatsPanelProps) {
+export function StatsPanel({ data, settings }: StatsPanelProps) {
 	const formatDuration = (seconds: number): string => {
 		const hours = Math.floor(seconds / 3600)
 		const minutes = Math.floor((seconds % 3600) / 60)
@@ -52,7 +53,7 @@ export function StatsPanel({ data }: StatsPanelProps) {
 					<div className="stat-label">Calories</div>
 				</div>
 
-				{data.avgHeartRate > 0 && (
+				{settings.showHeartRate && data.avgHeartRate > 0 && (
 					<div className="stat-item">
 						<div className="stat-value">{Math.round(data.avgHeartRate)}</div>
 						<div className="stat-label">Avg HR (bpm)</div>

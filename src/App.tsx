@@ -1,14 +1,26 @@
 import { format } from "date-fns"
 import { useRef, useState } from "react"
 import "./App.css"
+import { CardCustomizer } from "./components/CardCustomizer"
 import { ExportButton } from "./components/ExportButton"
 import { FileUpload } from "./components/FileUpload"
 import { WorkoutCard } from "./components/WorkoutCard"
 import { useFitParser } from "./hooks/useFitParser"
+import type { CardSettings } from "./types/workout"
 import { exportAsImage } from "./utils/imageExport"
+
+const defaultSettings: CardSettings = {
+	showHeartRate: true,
+	showTargetPower: true,
+	xAxisMode: "time",
+	xAxisInterval: null,
+	trimStartMinutes: 0,
+	trimEndMinutes: null,
+}
 
 function App() {
 	const [file, setFile] = useState<File | null>(null)
+	const [settings, setSettings] = useState<CardSettings>(defaultSettings)
 	const { data, loading, error } = useFitParser(file)
 	const cardRef = useRef<HTMLDivElement>(null)
 
@@ -33,7 +45,9 @@ function App() {
 
 	return (
 		<div className="app">
-			<WorkoutCard ref={cardRef} data={data} />
+			<WorkoutCard ref={cardRef} data={data} settings={settings} />
+
+			<CardCustomizer settings={settings} onChange={setSettings} data={data} />
 
 			<div className="app-actions">
 				<ExportButton onClick={handleExport} />

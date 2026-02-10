@@ -61,6 +61,7 @@ function transformFitData(data: FitFileData): WorkoutData {
 			timestamp,
 			elapsedMinutes: elapsedSeconds / 60,
 			power: record.power,
+			targetPower: record.target_power,
 			heartRate: record.heart_rate,
 			speed: record.speed,
 			cadence: record.cadence,

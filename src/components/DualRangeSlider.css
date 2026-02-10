@@ -1,0 +1,81 @@
+.dual-range-slider {
+	position: relative;
+	width: 100%;
+	height: 32px;
+}
+
+.dual-range-track {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	height: 4px;
+	transform: translateY(-50%);
+	background: var(--color-surface-hover, #334155);
+	border-radius: 2px;
+	pointer-events: none;
+}
+
+.dual-range-fill {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	background: var(--color-primary, #f97316);
+	border-radius: 2px;
+}
+
+.dual-range-input {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	-webkit-appearance: none;
+	appearance: none;
+	background: transparent;
+	pointer-events: none;
+	outline: none;
+}
+
+.dual-range-input::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: var(--color-text, #f1f5f9);
+	border: 2px solid var(--color-primary, #f97316);
+	cursor: pointer;
+	pointer-events: auto;
+	margin-top: -6px; /* (track height 4px - thumb height 16px) / 2 */
+}
+
+.dual-range-input::-moz-range-thumb {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: var(--color-text, #f1f5f9);
+	border: 2px solid var(--color-primary, #f97316);
+	cursor: pointer;
+	pointer-events: auto;
+}
+
+/* Ensure the end thumb sits on top when thumbs overlap */
+.dual-range-end {
+	z-index: 2;
+}
+
+.dual-range-input::-webkit-slider-runnable-track {
+	-webkit-appearance: none;
+	appearance: none;
+	height: 4px;
+	background: transparent;
+}
+
+.dual-range-input::-moz-range-track {
+	height: 4px;
+	background: transparent;
+	border: none;
+}

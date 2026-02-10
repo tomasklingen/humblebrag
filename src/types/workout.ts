@@ -17,10 +17,20 @@ export interface WorkoutRecord {
 	timestamp: Date
 	elapsedMinutes: number
 	power?: number // watts
+	targetPower?: number // watts (planned workout target)
 	heartRate?: number // bpm
 	speed?: number // km/h
 	cadence?: number // rpm
 	distance?: number // km
+}
+
+export interface CardSettings {
+	showHeartRate: boolean
+	showTargetPower: boolean
+	xAxisMode: "time" | "distance"
+	xAxisInterval: number | null // null = auto, otherwise minutes or km depending on xAxisMode
+	trimStartMinutes: number
+	trimEndMinutes: number | null // null = full workout (no trim)
 }
 
 // Raw FIT file data structure from fit-file-parser
@@ -65,6 +75,7 @@ export interface FitLap {
 export interface FitRecord {
 	timestamp?: Date | string
 	power?: number
+	target_power?: number
 	heart_rate?: number
 	speed?: number
 	cadence?: number
