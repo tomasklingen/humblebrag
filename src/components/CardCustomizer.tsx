@@ -73,69 +73,120 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 	return (
 		<div className="card-customizer">
 			<h3>Customize Card</h3>
-			<div className="customizer-options">
-				{hasHeartRate && (
-					<label className="customizer-toggle">
-						<input
-							type="checkbox"
-							checked={settings.showHeartRate}
-							onChange={(e) => onChange({ ...settings, showHeartRate: e.target.checked })}
-						/>
-						<span className="toggle-track">
-							<span className="toggle-thumb" />
-						</span>
-						<span className="toggle-label">Heart Rate</span>
-					</label>
-				)}
-				{hasTargetPower && (
-					<label className="customizer-toggle">
-						<input
-							type="checkbox"
-							checked={settings.showTargetPower}
-							onChange={(e) => onChange({ ...settings, showTargetPower: e.target.checked })}
-						/>
-						<span className="toggle-track">
-							<span className="toggle-thumb" />
-						</span>
-						<span className="toggle-label">Target Power</span>
-					</label>
-				)}
-				{hasDistance && (
-					<div className="customizer-segment">
-						<span className="segment-label">X-Axis</span>
-						<div className="segment-buttons">
-							<button
-								className={settings.xAxisMode === "time" ? "active" : ""}
-								onClick={() => handleXAxisModeChange("time")}
-							>
-								Time
-							</button>
-							<button
-								className={settings.xAxisMode === "distance" ? "active" : ""}
-								onClick={() => handleXAxisModeChange("distance")}
-							>
-								Distance
-							</button>
-						</div>
-					</div>
-				)}
-				<div className="customizer-segment">
-					<span className="segment-label">Interval</span>
-					<select
-						className="customizer-select"
-						value={settings.xAxisInterval ?? ""}
-						onChange={handleIntervalChange}
-					>
-						{intervals.map((opt) => (
-							<option key={opt.label} value={opt.value ?? ""}>
-								{opt.label}
-							</option>
-						))}
-					</select>
+
+			<div className="customizer-section">
+				<h4>Display</h4>
+				<div className="customizer-options">
+					{hasHeartRate && (
+						<label className="customizer-toggle">
+							<input
+								type="checkbox"
+								checked={settings.showHeartRate}
+								onChange={(e) => onChange({ ...settings, showHeartRate: e.target.checked })}
+							/>
+							<span className="toggle-track">
+								<span className="toggle-thumb" />
+							</span>
+							<span className="toggle-label">Heart Rate</span>
+						</label>
+					)}
+					{hasTargetPower && (
+						<label className="customizer-toggle">
+							<input
+								type="checkbox"
+								checked={settings.showTargetPower}
+								onChange={(e) => onChange({ ...settings, showTargetPower: e.target.checked })}
+							/>
+							<span className="toggle-track">
+								<span className="toggle-thumb" />
+							</span>
+							<span className="toggle-label">Target Power</span>
+						</label>
+					)}
 				</div>
 			</div>
 
-			<div className="customizer-trim">
+			<div className="customizer-section">
+				<h4>Data Cleanup</h4>
+				<div className="customizer-options">
+					<label className="customizer-toggle">
+						<input
+							type="checkbox"
+							checked={settings.smoothData}
+							onChange={(e) => onChange({ ...settings, smoothData: e.target.checked })}
+						/>
+						<span className="toggle-track">
+							<span className="toggle-thumb" />
+						</span>
+						<span className="toggle-label">Smooth Data</span>
+					</label>
+					<label className="customizer-toggle">
+						<input
+							type="checkbox"
+							checked={settings.removeZeroPower}
+							onChange={(e) => onChange({ ...settings, removeZeroPower: e.target.checked })}
+						/>
+						<span className="toggle-track">
+							<span className="toggle-thumb" />
+						</span>
+						<span className="toggle-label">Remove Zero Power</span>
+					</label>
+					{hasHeartRate && (
+						<label className="customizer-toggle">
+							<input
+								type="checkbox"
+								checked={settings.removeZeroHeartRate}
+								onChange={(e) => onChange({ ...settings, removeZeroHeartRate: e.target.checked })}
+							/>
+							<span className="toggle-track">
+								<span className="toggle-thumb" />
+							</span>
+							<span className="toggle-label">Remove Zero Heart Rate</span>
+						</label>
+					)}
+				</div>
+			</div>
+
+			<div className="customizer-section">
+				<h4>Chart Axis</h4>
+				<div className="customizer-options">
+					{hasDistance && (
+						<div className="customizer-segment">
+							<span className="segment-label">X-Axis</span>
+							<div className="segment-buttons">
+								<button
+									className={settings.xAxisMode === "time" ? "active" : ""}
+									onClick={() => handleXAxisModeChange("time")}
+								>
+									Time
+								</button>
+								<button
+									className={settings.xAxisMode === "distance" ? "active" : ""}
+									onClick={() => handleXAxisModeChange("distance")}
+								>
+									Distance
+								</button>
+							</div>
+						</div>
+					)}
+					<div className="customizer-segment">
+						<span className="segment-label">Interval</span>
+						<select
+							className="customizer-select"
+							value={settings.xAxisInterval ?? ""}
+							onChange={handleIntervalChange}
+						>
+							{intervals.map((opt) => (
+								<option key={opt.label} value={opt.value ?? ""}>
+									{opt.label}
+								</option>
+							))}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div className="customizer-section">
 				<h4>Trim Workout</h4>
 				<DualRangeSlider
 					min={0}

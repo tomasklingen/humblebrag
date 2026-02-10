@@ -9,6 +9,7 @@ import {
 	YAxis,
 } from "recharts"
 import type { CardSettings, WorkoutRecord } from "../types/workout"
+import { removeSpikes, removeZeroPower, removeZeroHeartRate } from "../utils/dataCleanup"
 import "./PowerChart.css"
 
 interface PowerChartProps {
@@ -36,15 +37,29 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 		)
 	}, [records, settings.trimStartMinutes, settings.trimEndMinutes])
 
+	const cleanedRecords = useMemo(() => {
+		let cleaned = trimmedRecords
+		if (settings.removeZeroPower) {
+			cleaned = removeZeroPower(cleaned)
+		}
+		if (settings.removeZeroHeartRate) {
+			cleaned = removeZeroHeartRate(cleaned)
+		}
+		if (settings.smoothData) {
+			cleaned = removeSpikes(cleaned)
+		}
+		return cleaned
+	}, [trimmedRecords, settings.smoothData, settings.removeZeroPower, settings.removeZeroHeartRate])
+
 	// Filter out records without power data and decimate for performance
 	const powerRecords = useMemo(() => {
-		const withPower = trimmedRecords.filter((r) => r.power !== undefined && r.power > 0)
+		const withPower = cleanedRecords.filter((r) => r.power !== undefined && r.power > 0)
 		if (withPower.length > 1000) {
 			const step = Math.ceil(withPower.length / 1000)
 			return withPower.filter((_, index) => index % step === 0)
 		}
 		return withPower
-	}, [trimmedRecords])
+	}, [cleanedRecords])
 
 	if (powerRecords.length === 0) {
 		return (

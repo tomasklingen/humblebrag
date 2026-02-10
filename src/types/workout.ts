@@ -27,6 +27,9 @@ export interface WorkoutRecord {
 export interface CardSettings {
 	showHeartRate: boolean
 	showTargetPower: boolean
+	smoothData: boolean
+	removeZeroPower: boolean
+	removeZeroHeartRate: boolean
 	xAxisMode: "time" | "distance"
 	xAxisInterval: number | null // null = auto, otherwise minutes or km depending on xAxisMode
 	trimStartMinutes: number
