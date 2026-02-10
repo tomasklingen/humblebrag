@@ -1,4 +1,5 @@
 import type { WorkoutRecord } from "../types/workout"
+import { classifyWorkout, type WorkoutClassification } from "./workoutClassifier"
 
 /**
  * Advanced power metrics derived from workout data.
@@ -13,6 +14,7 @@ export interface PowerMetrics {
 	bestPower5min: number // Best 5-minute average power
 	bestPower20min: number // Best 20-minute average power (FTP estimate)
 	workKJ: number // Total work in kilojoules
+	classification: WorkoutClassification // Workout type classification
 }
 
 /**
@@ -118,6 +120,14 @@ export function computePowerMetrics(
 	// Work in kilojoules (approximately equal to calories for cycling)
 	const workKJ = (avgPower * durationSeconds) / 1000
 
+	// Classify the workout
+	const classification = classifyWorkout(
+		records,
+		functionalThresholdPower,
+		normalizedPower,
+		variabilityIndex,
+	)
+
 	return {
 		normalizedPower: Math.round(normalizedPower),
 		intensityFactor: Number(intensityFactor.toFixed(2)),
@@ -127,5 +137,6 @@ export function computePowerMetrics(
 		bestPower5min: Math.round(bestPower5min),
 		bestPower20min: Math.round(bestPower20min),
 		workKJ: Math.round(workKJ),
+		classification,
 	}
 }
