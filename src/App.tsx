@@ -21,6 +21,8 @@ const defaultSettings: CardSettings = {
 	xAxisInterval: null,
 	trimStartMinutes: 0,
 	trimEndMinutes: null,
+	statsDisplayMode: "advanced",
+	functionalThresholdPower: 0,
 }
 
 function loadSettings(): CardSettings {
@@ -38,6 +40,9 @@ function loadSettings(): CardSettings {
 				removeZeroHeartRate: parsed.removeZeroHeartRate ?? defaultSettings.removeZeroHeartRate,
 				xAxisMode: parsed.xAxisMode ?? defaultSettings.xAxisMode,
 				xAxisInterval: parsed.xAxisInterval ?? defaultSettings.xAxisInterval,
+				statsDisplayMode: parsed.statsDisplayMode ?? defaultSettings.statsDisplayMode,
+				functionalThresholdPower:
+					parsed.functionalThresholdPower ?? defaultSettings.functionalThresholdPower,
 			}
 		}
 	} catch (error) {
@@ -57,6 +62,8 @@ function saveSettings(settings: CardSettings): void {
 			removeZeroHeartRate: settings.removeZeroHeartRate,
 			xAxisMode: settings.xAxisMode,
 			xAxisInterval: settings.xAxisInterval,
+			statsDisplayMode: settings.statsDisplayMode,
+			functionalThresholdPower: settings.functionalThresholdPower,
 		}
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
 	} catch (error) {

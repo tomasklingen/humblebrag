@@ -131,6 +131,29 @@
 	border-color: var(--color-primary, #f97316);
 }
 
+/* Input field */
+.customizer-input {
+	width: 5rem;
+	padding: 0.375rem 0.75rem;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--color-text, #f1f5f9);
+	background: var(--color-surface-hover, #334155);
+	border: 1px solid var(--color-border, #475569);
+	border-radius: 6px;
+	outline: none;
+}
+
+.customizer-input:focus {
+	border-color: var(--color-primary, #f97316);
+}
+
+.segment-unit {
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--color-text-secondary, #94a3b8);
+}
+
 /* Section styling */
 .customizer-section {
 	margin-top: 1.25rem;

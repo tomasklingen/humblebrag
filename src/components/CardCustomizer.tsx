@@ -75,7 +75,45 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 			<h3>Customize Card</h3>
 
 			<div className="customizer-section">
-				<h4>Display</h4>
+				<h4>Stats Display</h4>
+				<div className="customizer-options">
+					<div className="customizer-segment">
+						<span className="segment-label">Mode</span>
+						<div className="segment-buttons">
+							<button
+								className={settings.statsDisplayMode === "basic" ? "active" : ""}
+								onClick={() => onChange({ ...settings, statsDisplayMode: "basic" })}
+							>
+								Basic
+							</button>
+							<button
+								className={settings.statsDisplayMode === "advanced" ? "active" : ""}
+								onClick={() => onChange({ ...settings, statsDisplayMode: "advanced" })}
+							>
+								Advanced
+							</button>
+						</div>
+					</div>
+					<div className="customizer-segment">
+						<span className="segment-label">FTP</span>
+						<input
+							type="number"
+							min={0}
+							step={1}
+							placeholder="0"
+							value={settings.functionalThresholdPower || ""}
+							onChange={(e) =>
+								onChange({ ...settings, functionalThresholdPower: Number(e.target.value) || 0 })
+							}
+							className="customizer-input"
+						/>
+						<span className="segment-unit">W</span>
+					</div>
+				</div>
+			</div>
+
+			<div className="customizer-section">
+				<h4>Chart Display</h4>
 				<div className="customizer-options">
 					{hasHeartRate && (
 						<label className="customizer-toggle">

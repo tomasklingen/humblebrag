@@ -1,5 +1,5 @@
 .stats-panel {
-	padding: 2rem;
+	padding: 2.5rem 2rem 2rem;
 }
 
 .stats-header {
@@ -7,30 +7,95 @@
 	text-align: center;
 }
 
+.workout-title {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	margin-bottom: 0.5rem;
+}
+
 .stats-header h2 {
-	margin: 0 0 0.5rem 0;
-	font-size: 1.75rem;
-	font-weight: 700;
+	margin: 0;
+	font-size: 2rem;
+	font-weight: 800;
+	background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	letter-spacing: -0.02em;
+}
+
+.workout-type {
+	display: inline-block;
+	padding: 0.25rem 0.75rem;
+	background: rgba(249, 115, 22, 0.15);
+	border: 1px solid rgba(249, 115, 22, 0.3);
+	border-radius: 12px;
+	color: #fbbf24;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
 }
 
 .workout-date {
 	margin: 0;
 	color: var(--color-text-secondary, #94a3b8);
 	font-size: 0.875rem;
+	font-weight: 500;
 }
 
-.workout-type {
-	margin: 0.25rem 0 0 0;
+/* Primary stats - hero section */
+.stats-primary {
+	display: flex;
+	justify-content: center;
+	gap: 3rem;
+	margin-bottom: 2rem;
+	padding: 2rem 0;
+	border-bottom: 2px solid rgba(249, 115, 22, 0.2);
+}
+
+.stat-primary {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.stat-value-large {
+	font-size: 3rem;
+	font-weight: 900;
+	line-height: 1;
+	background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	letter-spacing: -0.02em;
+}
+
+.stat-label-large {
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: var(--color-text-secondary, #94a3b8);
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+}
+
+.stat-unit {
+	font-size: 0.65rem;
+	font-weight: 600;
 	color: var(--color-text-muted, #64748b);
-	font-size: 0.875rem;
-	text-transform: capitalize;
+	text-transform: lowercase;
+	margin-top: -0.25rem;
 }
 
+/* Secondary stats grid */
 .stats-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-	gap: 1.5rem;
-	max-width: 600px;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 1rem;
+	max-width: 700px;
 	margin: 0 auto;
 }
 
@@ -38,47 +103,79 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 1rem;
-	background: var(--color-surface-light, #334155);
-	border-radius: 8px;
-	transition: transform 0.2s ease;
+	justify-content: center;
+	padding: 1rem 0.75rem;
+	background: linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, rgba(251, 191, 36, 0.05) 100%);
+	border: 1px solid rgba(249, 115, 22, 0.15);
+	border-radius: 12px;
+	transition: all 0.2s ease;
+	min-height: 70px;
 }
 
 .stat-item:hover {
+	background: linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, rgba(251, 191, 36, 0.08) 100%);
+	border-color: rgba(249, 115, 22, 0.3);
 	transform: translateY(-2px);
 }
 
-.stat-value {
-	font-size: 2rem;
-	font-weight: 700;
-	color: var(--color-accent, #fbbf24);
-	margin-bottom: 0.25rem;
-	line-height: 1;
-}
-
 .stat-label {
-	font-size: 0.75rem;
+	font-size: 0.7rem;
+	font-weight: 600;
 	color: var(--color-text-secondary, #94a3b8);
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
-	text-align: center;
+	margin-bottom: 0.5rem;
+}
+
+.stat-value {
+	font-size: 1.5rem;
+	font-weight: 800;
+	color: var(--color-text, #f1f5f9);
+	line-height: 1;
 }
 
 @media (max-width: 768px) {
 	.stats-panel {
-		padding: 1.5rem;
+		padding: 2rem 1.5rem 1.5rem;
+	}
+
+	.stats-header h2 {
+		font-size: 1.5rem;
+	}
+
+	.workout-title {
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.stats-primary {
+		gap: 2rem;
+		padding: 1.5rem 0;
+	}
+
+	.stat-value-large {
+		font-size: 2.25rem;
+	}
+
+	.stat-label-large {
+		font-size: 0.65rem;
 	}
 
 	.stats-grid {
 		grid-template-columns: repeat(2, 1fr);
-		gap: 1rem;
+		gap: 0.75rem;
+	}
+
+	.stat-item {
+		padding: 0.875rem 0.5rem;
+		min-height: 60px;
 	}
 
 	.stat-value {
-		font-size: 1.5rem;
+		font-size: 1.25rem;
 	}
 
 	.stat-label {
-		font-size: 0.7rem;
+		font-size: 0.65rem;
 	}
 }

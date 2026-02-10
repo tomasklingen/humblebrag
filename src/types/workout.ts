@@ -34,6 +34,8 @@ export interface CardSettings {
 	xAxisInterval: number | null // null = auto, otherwise minutes or km depending on xAxisMode
 	trimStartMinutes: number
 	trimEndMinutes: number | null // null = full workout (no trim)
+	statsDisplayMode: "basic" | "advanced" // basic = simple stats, advanced = pro metrics
+	functionalThresholdPower: number // User's FTP in watts (0 = not set)
 }
 
 // Raw FIT file data structure from fit-file-parser
