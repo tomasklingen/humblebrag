@@ -13,7 +13,7 @@
 .chart-header-accent {
 	width: 3px;
 	height: 1rem;
-	background: var(--color-primary);
+	background: linear-gradient(180deg, var(--color-accent), var(--color-primary));
 	flex-shrink: 0;
 }
 
@@ -32,10 +32,6 @@
 	text-align: center;
 	color: var(--color-text-muted);
 	font-style: italic;
-}
-
-.chart-container .recharts-cartesian-grid-horizontal line:first-child {
-	display: none;
 }
 
 @media (width <= 768px) {

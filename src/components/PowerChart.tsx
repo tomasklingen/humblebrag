@@ -156,6 +156,7 @@ export function PowerChart({ records, settings, sport }: PowerChartProps) {
 					<CartesianGrid
 						strokeDasharray="3 3"
 						stroke="var(--color-border)"
+						horizontal={false}
 						vertical={settings.showXAxisMarkers}
 					/>
 					<XAxis

@@ -9,6 +9,17 @@
 	padding: 1.25rem 2.5rem;
 	display: flex;
 	align-items: center;
+	position: relative;
+}
+
+.workout-card-header::after {
+	content: "";
+	position: absolute;
+	left: 2.5rem;
+	right: 2.5rem;
+	bottom: 0;
+	height: 1px;
+	background: linear-gradient(90deg, var(--color-accent), color-mix(in oklch, var(--color-surface) 70%, transparent));
 }
 
 .header-brand {
@@ -16,7 +27,7 @@
 	font-size: var(--text-caption);
 	font-weight: var(--weight-extrabold);
 	letter-spacing: var(--tracking-widest);
-	color: var(--color-text-ghost);
+	color: color-mix(in oklch, var(--color-accent) 68%, var(--color-text-ghost));
 	text-transform: uppercase;
 }
 
@@ -36,7 +47,7 @@
 	right: 2.5rem;
 	top: 0;
 	height: 1px;
-	background: var(--color-surface);
+	background: color-mix(in oklch, var(--color-accent) 28%, var(--color-surface));
 }
 
 .footer-text {
@@ -44,7 +55,7 @@
 	font-size: var(--text-caption);
 	font-weight: var(--weight-extrabold);
 	letter-spacing: var(--tracking-widest);
-	color: var(--color-text-invisible);
+	color: color-mix(in oklch, var(--color-accent) 42%, var(--color-text-invisible));
 	text-transform: uppercase;
 }
 
@@ -55,6 +66,11 @@
 
 	.workout-card-header {
 		padding: 1rem 1.5rem;
+	}
+
+	.workout-card-header::after {
+		left: 1.5rem;
+		right: 1.5rem;
 	}
 
 	.workout-card-footer {
