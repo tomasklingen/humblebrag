@@ -22,11 +22,12 @@ import {
 } from "./utils/themePalette"
 
 const STORAGE_KEY = "humblebrag-settings"
+const MAX_ACTIVITY_TITLE_LENGTH = 28
 
 const defaultSettings: CardSettings = {
 	showHeartRate: true,
 	showTargetPower: true,
-	smoothData: 0,
+	smoothData: 50,
 	removeZeroPower: false,
 	removeZeroHeartRate: false,
 	...DEFAULT_THEME_MODEL,
@@ -39,6 +40,32 @@ const defaultSettings: CardSettings = {
 	functionalThresholdPower: 0,
 	graphLineThickness: 1.2,
 	showXAxisMarkers: true,
+	activityTitle: "",
+}
+
+const getSportAxisDefaults = (sport: string): Pick<CardSettings, "xAxisMode" | "xAxisInterval"> => {
+	if (sport.toLowerCase().includes("running")) {
+		return {
+			xAxisMode: "distance",
+			xAxisInterval: 1,
+		}
+	}
+
+	return {
+		xAxisMode: "distance",
+		xAxisInterval: 5,
+	}
+}
+
+const getDefaultSettingsForSport = (sport?: string): CardSettings => {
+	if (!sport) {
+		return defaultSettings
+	}
+
+	return {
+		...defaultSettings,
+		...getSportAxisDefaults(sport),
+	}
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -96,7 +123,7 @@ function loadSettings(): CardSettings {
 				smoothData:
 					typeof parsed.smoothData === "boolean"
 						? parsed.smoothData
-							? 55
+							? 50
 							: 0
 						: isFiniteNumber(parsed.smoothData)
 							? Math.min(100, Math.max(0, parsed.smoothData))
@@ -136,6 +163,12 @@ function loadSettings(): CardSettings {
 					typeof parsed.showXAxisMarkers === "boolean"
 						? parsed.showXAxisMarkers
 						: defaultSettings.showXAxisMarkers,
+				activityTitle:
+					typeof parsed.activityTitle === "string"
+						? parsed.activityTitle.slice(0, MAX_ACTIVITY_TITLE_LENGTH)
+						: typeof parsed.cardTitle === "string"
+							? parsed.cardTitle.slice(0, MAX_ACTIVITY_TITLE_LENGTH)
+							: defaultSettings.activityTitle,
 			}
 		}
 	} catch (error) {
@@ -165,6 +198,7 @@ function saveSettings(settings: CardSettings): void {
 			functionalThresholdPower: settings.functionalThresholdPower,
 			graphLineThickness: settings.graphLineThickness,
 			showXAxisMarkers: settings.showXAxisMarkers,
+			activityTitle: settings.activityTitle,
 		}
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
 	} catch (error) {
@@ -174,6 +208,7 @@ function saveSettings(settings: CardSettings): void {
 
 function App() {
 	const supportsPopoverApi = "showPopover" in HTMLElement.prototype
+	const isDevMode = import.meta.env.DEV
 	const [file, setFile] = useState<File | null>(null)
 	const [settings, setSettings] = useState<CardSettings>(loadSettings)
 	const { data, loading, error } = useFitParser(file)
@@ -239,6 +274,27 @@ function App() {
 		saveSettings(settings)
 	}, [settings])
 
+	useEffect(() => {
+		if (!data?.sport) {
+			return
+		}
+
+		const sportAxisDefaults = getSportAxisDefaults(data.sport)
+		setSettings((currentSettings) => {
+			if (
+				currentSettings.xAxisMode === sportAxisDefaults.xAxisMode &&
+				currentSettings.xAxisInterval === sportAxisDefaults.xAxisInterval
+			) {
+				return currentSettings
+			}
+
+			return {
+				...currentSettings,
+				...sportAxisDefaults,
+			}
+		})
+	}, [data?.sport])
+
 	const handleExport = async () => {
 		if (!cardRef.current || !data || isExporting) {
 			return
@@ -301,6 +357,11 @@ function App() {
 		setFile(null)
 	}
 
+	const handleDevStorageReset = () => {
+		localStorage.removeItem(STORAGE_KEY)
+		setSettings(getDefaultSettingsForSport(data?.sport))
+	}
+
 	const handleAdjustedDataDownload = () => {
 		if (!file || !cleanupAdjustmentResult) {
 			return
@@ -360,6 +421,11 @@ function App() {
 					<div className="app-logo">humblebrag</div>
 				</header>
 				<FileUpload onFileSelect={setFile} loading={loading} error={error} />
+				{isDevMode ? (
+					<button className="dev-storage-reset-button" onClick={handleDevStorageReset}>
+						Clear Local Storage
+					</button>
+				) : null}
 			</div>
 		)
 	}
@@ -439,6 +505,12 @@ function App() {
 						<p className="export-popover-error">{exportError}</p>
 					) : null}
 				</div>
+			) : null}
+
+			{isDevMode ? (
+				<button className="dev-storage-reset-button" onClick={handleDevStorageReset}>
+					Clear Local Storage
+				</button>
 			) : null}
 		</div>
 	)

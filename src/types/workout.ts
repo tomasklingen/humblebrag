@@ -46,6 +46,7 @@ export interface CardSettings {
 	functionalThresholdPower: number // User's FTP in watts (0 = not set)
 	graphLineThickness: number // Line thickness for chart series
 	showXAxisMarkers: boolean // Show vertical x-axis marker grid lines
+	activityTitle: string // Custom activity title shown in stats header
 }
 
 // Raw FIT file data structure from fit-file-parser

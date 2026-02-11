@@ -252,6 +252,28 @@
 	border-color: var(--color-primary);
 }
 
+.customizer-text-field {
+	display: grid;
+	gap: 0.45rem;
+	max-width: 16rem;
+}
+
+.customizer-text-input {
+	width: 100%;
+	padding: 0.375rem 0.75rem;
+	font-size: var(--text-body);
+	font-weight: var(--weight-medium);
+	color: var(--color-text);
+	background: var(--color-surface-hover);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	outline: none;
+}
+
+.customizer-text-input:focus {
+	border-color: var(--color-primary);
+}
+
 .segment-unit {
 	font-size: 0.875rem;
 	font-weight: var(--weight-medium);

@@ -39,6 +39,7 @@ type ComposerNodeId = "background" | "surface" | "primary" | "accent"
 type SidebarSection = "general" | "chart" | "theme"
 
 const CLOSE_BEFORE_OPEN_MS = 210
+const MAX_ACTIVITY_TITLE_LENGTH = 28
 
 interface ComposerNode {
 	id: ComposerNodeId
@@ -314,6 +315,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 	const handleShowTargetPowerChange = (e: React.ChangeEvent<HTMLInputElement>) =>
 		onChange({ ...settings, showTargetPower: e.target.checked })
 
+	const handleActivityTitleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		onChange({ ...settings, activityTitle: e.target.value.slice(0, MAX_ACTIVITY_TITLE_LENGTH) })
+
 	const handleXAxisTimeMode = () => handleXAxisModeChange("time")
 
 	const handleXAxisDistanceMode = () => handleXAxisModeChange("distance")
@@ -400,6 +404,23 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 									<span className="toggle-label">Show Power Records</span>
 								</label>
 							) : null}
+						</div>
+					</div>
+
+					<div className="customizer-group">
+						<h5>Activity</h5>
+						<div className="customizer-group-body">
+							<label className="customizer-text-field">
+								<span className="segment-label">Title</span>
+								<input
+									type="text"
+									className="customizer-text-input"
+									value={settings.activityTitle}
+									onChange={handleActivityTitleChange}
+									maxLength={MAX_ACTIVITY_TITLE_LENGTH}
+									placeholder={data.sport}
+								/>
+							</label>
 						</div>
 					</div>
 				</div>

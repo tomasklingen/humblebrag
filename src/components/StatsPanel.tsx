@@ -20,8 +20,11 @@ const formatDuration = (seconds: number): string => {
 	return `${minutes}:${secs.toString().padStart(2, "0")}`
 }
 
-const formatSubSport = (subSport: string): string => {
-	if (subSport === "virtual_activity") return "Virtual"
+const formatSubSport = (sport: string, subSport: string): string => {
+	if (subSport === "virtual_activity") {
+		return sport.toLowerCase().includes("cycling") ? "Virtual Ride" : "Virtual"
+	}
+
 	return subSport
 }
 
@@ -46,6 +49,7 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 	const isRunning = data.sport.toLowerCase().includes("running")
 	const classificationEmoji =
 		isRunning && classification.emoji === "🚴" ? "🏃" : classification.emoji
+	const activityTitle = settings.activityTitle.trim() || data.sport
 
 	return (
 		<div className="stats-panel">
@@ -61,8 +65,10 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 			<div className="stats-header">
 				<div className="header-top">
 					<div className="sport-badge">
-						<div className="sport-name">{data.sport.toUpperCase()}</div>
-						{data.subSport && <div className="sport-sub">{formatSubSport(data.subSport)}</div>}
+						<div className="sport-name">{activityTitle}</div>
+						{data.subSport && (
+							<div className="sport-sub">{formatSubSport(data.sport, data.subSport)}</div>
+						)}
 					</div>
 					<div className="date-vertical">
 						<div className="date-line">{format(data.date, "MMM")}</div>
