@@ -13,6 +13,7 @@
 - `npm run dev` - run local dev server.
 - `npm run format` - format code (`oxfmt`).
 - `npm run lint` - type-aware linting (`oxlint --type-aware .`).
+- `npm run stylelint` - lint CSS styles (`stylelint "src/**/*.css"`).
 - `npm run build` - TypeScript project build (`tsc -b`) + production bundle.
 
 ## Coding Standards
@@ -25,5 +26,6 @@
 
 - During normal agentic code-modification work, run continuous checks:
   - lint frequently while iterating (`npm run lint`)
-  - typecheck/build before finishing (`npm run build`)
+  - stylelint frequently while iterating (`npm run stylelint`)
+  - typecheck before finishing (`npm run typecheck`)
 - Fix issues as they appear; do not defer validation to the end.

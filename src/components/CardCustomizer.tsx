@@ -277,13 +277,14 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 	}
 
 	const toggleSection = (section: SidebarSection) => {
-		if (section === activeSection) {
-			return
-		}
-
 		if (sectionTransitionTimer.current !== null) {
 			window.clearTimeout(sectionTransitionTimer.current)
 			sectionTransitionTimer.current = null
+		}
+
+		if (section === activeSection) {
+			setActiveSection(null)
+			return
 		}
 
 		setActiveSection(null)
