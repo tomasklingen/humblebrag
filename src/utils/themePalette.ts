@@ -24,10 +24,10 @@ export interface ThemePalette {
 }
 
 export const DEFAULT_THEME_MODEL: ThemeModel = {
-	themeHue: 24,
-	themeVibrance: 72,
-	themeDepth: 76,
-	themeContrast: 62,
+	themeHue: 188,
+	themeVibrance: 58,
+	themeDepth: 66,
+	themeContrast: 68,
 	themeHarmony: "analogous",
 }
 
