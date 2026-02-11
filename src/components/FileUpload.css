@@ -5,6 +5,58 @@
 	justify-content: center;
 	min-height: 60vh;
 	padding: 2rem;
+	gap: 1.1rem;
+}
+
+.upload-hero {
+	width: 100%;
+	max-width: 720px;
+	text-align: center;
+	display: grid;
+	gap: 0.7rem;
+}
+
+.upload-kicker {
+	margin: 0;
+	font-size: 0.68rem;
+	font-weight: var(--weight-semibold);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: color-mix(in oklch, var(--color-accent) 65%, var(--color-text-secondary));
+}
+
+.upload-hero h1 {
+	margin: 0;
+	font-size: clamp(1.35rem, 3.1vw, 2rem);
+	font-weight: var(--weight-semibold);
+	letter-spacing: -0.015em;
+	line-height: 1.15;
+}
+
+.upload-description {
+	margin: 0;
+	font-size: 0.94rem;
+	line-height: 1.5;
+	color: var(--color-text-secondary);
+}
+
+.upload-highlights {
+	display: inline-flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 0.45rem;
+}
+
+.upload-highlights span {
+	padding: 0.3rem 0.55rem;
+	font-size: 0.66rem;
+	font-weight: var(--weight-semibold);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--color-text-secondary);
+	border: 1px solid color-mix(in oklch, var(--color-border) 72%, transparent);
+	border-radius: 999px;
+	background: color-mix(in oklch, var(--color-surface) 30%, transparent);
 }
 
 .file-upload-zone {
@@ -99,7 +151,17 @@
 }
 
 @media (width <= 768px) {
+	.file-upload-container {
+		padding: 1.25rem 0.75rem;
+	}
+
+	.upload-hero {
+		gap: 0.55rem;
+	}
+
 	.file-upload-zone {
 		max-width: 100%;
+		min-height: 270px;
 	}
+
 }

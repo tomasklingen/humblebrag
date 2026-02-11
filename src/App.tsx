@@ -204,6 +204,7 @@ function saveSettings(settings: CardSettings): void {
 function App() {
 	const supportsPopoverApi = "showPopover" in HTMLElement.prototype
 	const isDevMode = import.meta.env.DEV
+	const currentYear = new Date().getFullYear()
 	const [file, setFile] = useState<File | null>(null)
 	const [settings, setSettings] = useState<CardSettings>(loadSettings)
 	const { data, loading, error } = useFitParser(file)
@@ -449,6 +450,7 @@ function App() {
 					<div className="app-logo">humblebrag</div>
 				</header>
 				<FileUpload onFileSelect={handleFileSelect} loading={loading} error={error} />
+				<footer className="app-footer">© {currentYear} Tomas Klingen</footer>
 				{isDevMode ? (
 					<button className="dev-storage-reset-button" onClick={handleDevStorageReset}>
 						Clear Local Storage
@@ -486,9 +488,13 @@ function App() {
 			</header>
 
 			<div className="app-workspace">
-				<aside className="app-sidebar" aria-label="Customization sidebar">
-					<ThemeLabWidget settings={settings} onChange={setSettings} data={data} />
-				</aside>
+				<div className="app-sidebar-column">
+					<aside className="app-sidebar" aria-label="Customization sidebar">
+						<ThemeLabWidget settings={settings} onChange={setSettings} data={data} />
+					</aside>
+
+					<footer className="app-workspace-footer">© {currentYear} Tomas Klingen</footer>
+				</div>
 
 				<main className="app-canvas-area">
 					<div className="app-canvas-panel">
@@ -501,6 +507,8 @@ function App() {
 					</div>
 				</main>
 			</div>
+
+			<footer className="app-footer app-footer-mobile">© {currentYear} Tomas Klingen</footer>
 
 			{isExportPopoverVisible ? (
 				<div

@@ -60,6 +60,20 @@ export function FileUpload({ onFileSelect, loading, error }: FileUploadProps) {
 
 	return (
 		<div className="file-upload-container">
+			<div className="upload-hero">
+				<p className="upload-kicker">Performance Card Studio</p>
+				<h1>Turn your workout file into a sharp post-ready card.</h1>
+				<p className="upload-description">
+					Upload a FIT file to generate a clean summary with power, pace, heart rate, and a
+					customizable visual style.
+				</p>
+				<div className="upload-highlights" aria-label="What you can do">
+					<span>Advanced metrics</span>
+					<span>Theme controls</span>
+					<span>Export image</span>
+				</div>
+			</div>
+
 			<div
 				className={`file-upload-zone ${dragOver ? "drag-over" : ""} ${loading === true ? "loading" : ""}`}
 				onDragOver={handleDragOver}
@@ -109,6 +123,7 @@ export function FileUpload({ onFileSelect, loading, error }: FileUploadProps) {
 					<strong>Error:</strong> {error}
 				</div>
 			)}
+
 		</div>
 	)
 }
