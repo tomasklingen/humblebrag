@@ -3,13 +3,42 @@
 	padding: 1rem;
 }
 
-.app-actions {
+.app-header {
 	display: flex;
-	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	max-width: 1100px;
+	margin: 0 auto;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--color-border, #475569);
+	background: color-mix(in oklch, var(--color-surface, #1e293b) 80%, transparent);
+	backdrop-filter: blur(8px);
+	border-radius: 14px;
+}
+
+.app-header-empty {
+	justify-content: center;
+	margin-bottom: 1.5rem;
+}
+
+.app-logo {
+	font-family: var(--font-display);
+	font-size: 0.9rem;
+	font-weight: var(--weight-extrabold);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+	color: var(--color-text);
+}
+
+.app-header-actions {
+	display: flex;
 	align-items: center;
 	gap: 1rem;
-	margin: 2rem auto;
-	max-width: 400px;
+}
+
+.app-header-button {
+	min-height: 44px;
 }
 
 .reset-button {
@@ -30,17 +59,147 @@
 	background: var(--color-surface, #1e293b);
 }
 
+.export-popover {
+	position: fixed;
+	inset: 50% auto auto 50%;
+	transform: translate(-50%, -50%);
+	margin: 0;
+	width: min(92vw, 620px);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	padding: 1rem;
+	border-radius: 16px;
+	background: var(--color-background, #0f172a);
+	border: 1px solid var(--color-border, #475569);
+	box-shadow: 0 24px 70px rgb(2 6 23 / 50%);
+}
+
+.export-popover::backdrop {
+	background: rgb(2 6 23 / 72%);
+	backdrop-filter: blur(3px);
+}
+
+.export-popover-close {
+	align-self: flex-end;
+	padding: 0.45rem 0.7rem;
+	font-size: var(--text-caption);
+	font-weight: var(--weight-semibold);
+	letter-spacing: var(--tracking-normal);
+	text-transform: uppercase;
+	color: var(--color-text-secondary, #94a3b8);
+	background: transparent;
+	border: 1px solid var(--color-border, #475569);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+}
+
+.export-popover-image {
+	width: min(100%, 560px);
+	aspect-ratio: 1;
+	object-fit: contain;
+	border-radius: 12px;
+	border: 1px solid var(--color-border, #475569);
+	background: var(--color-background, #0f172a);
+}
+
+.export-popover-download {
+	width: 100%;
+	max-width: 300px;
+	padding: 0.85rem 1rem;
+	font-size: 0.95rem;
+	font-weight: var(--weight-semibold);
+	color: var(--color-background);
+	background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+	border: none;
+	border-radius: var(--radius-lg);
+	cursor: pointer;
+	transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+	box-shadow: 0 8px 18px rgb(251 191 36 / 22%);
+}
+
+.export-popover-download:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 12px 24px rgb(251 191 36 / 30%);
+}
+
+.export-popover-loading {
+	width: 100%;
+	min-height: 220px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.9rem;
+	border: 1px solid var(--color-border, #475569);
+	border-radius: 12px;
+	background: color-mix(in oklch, var(--color-surface, #1e293b) 72%, transparent);
+}
+
+.export-popover-spinner {
+	width: 24px;
+	height: 24px;
+	border: 3px solid rgb(148 163 184 / 35%);
+	border-top-color: var(--color-accent, #fbbf24);
+	border-radius: 50%;
+	animation: export-popover-spin 0.7s linear infinite;
+}
+
+.export-popover-status {
+	font-size: 0.9rem;
+	font-weight: var(--weight-medium);
+	letter-spacing: var(--tracking-normal);
+	text-transform: uppercase;
+	color: var(--color-text-secondary, #94a3b8);
+}
+
+.export-popover-error {
+	width: 100%;
+	padding: 1rem;
+	text-align: center;
+	font-size: 0.92rem;
+	color: var(--color-error-light, #fca5a5);
+	border: 1px solid color-mix(in oklch, var(--color-error, #ef4444) 50%, var(--color-border, #475569));
+	border-radius: 12px;
+	background: color-mix(in oklch, var(--color-error, #ef4444) 12%, transparent);
+}
+
+@keyframes export-popover-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 @media (width <= 768px) {
 	.app {
 		padding: 0.5rem;
 	}
 
-	.app-actions {
-		width: 100%;
-		padding: 0 1rem;
+	.app-header {
+		flex-direction: column;
+		align-items: stretch;
 	}
 
+	.app-logo {
+		text-align: center;
+	}
+
+	.app-header-actions {
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.app-header-actions .export-button,
 	.reset-button {
 		width: 100%;
+	}
+
+	.export-popover {
+		padding: 0.75rem;
+	}
+
+	.export-popover-loading {
+		min-height: 180px;
 	}
 }

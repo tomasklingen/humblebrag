@@ -7,7 +7,7 @@ import { ThemeLabWidget } from "./components/ThemeLabWidget"
 import { WorkoutCard } from "./components/WorkoutCard"
 import { useFitParser } from "./hooks/useFitParser"
 import type { CardSettings } from "./types/workout"
-import { exportAsImage } from "./utils/imageExport"
+import { downloadImage, exportAsImage } from "./utils/imageExport"
 import {
 	DEFAULT_THEME_MODEL,
 	createThemePalette,
@@ -38,6 +38,22 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isFiniteNumber = (value: unknown): value is number =>
 	typeof value === "number" && Number.isFinite(value)
+
+const blobToDataUrl = async (blob: Blob): Promise<string> =>
+	new Promise((resolve, reject) => {
+		const reader = new FileReader()
+		reader.addEventListener("load", () => {
+			if (typeof reader.result === "string") {
+				resolve(reader.result)
+				return
+			}
+			reject(new Error("Failed to read exported image preview"))
+		})
+		reader.addEventListener("error", () => {
+			reject(reader.error ?? new Error("Failed to read exported image preview"))
+		})
+		reader.readAsDataURL(blob)
+	})
 
 function loadSettings(): CardSettings {
 	try {
@@ -132,10 +148,18 @@ function saveSettings(settings: CardSettings): void {
 }
 
 function App() {
+	const supportsPopoverApi = "showPopover" in HTMLElement.prototype
 	const [file, setFile] = useState<File | null>(null)
 	const [settings, setSettings] = useState<CardSettings>(loadSettings)
 	const { data, loading, error } = useFitParser(file)
 	const cardRef = useRef<HTMLDivElement>(null)
+	const exportPopoverRef = useRef<HTMLDivElement>(null)
+	const [isExportPopoverVisible, setIsExportPopoverVisible] = useState(false)
+	const [isExporting, setIsExporting] = useState(false)
+	const [exportedImageBlob, setExportedImageBlob] = useState<Blob | null>(null)
+	const [exportedImageUrl, setExportedImageUrl] = useState<string | null>(null)
+	const [exportFilename, setExportFilename] = useState("")
+	const [exportError, setExportError] = useState<string | null>(null)
 	const themePalette = useMemo(
 		() =>
 			createThemePalette({
@@ -179,19 +203,91 @@ function App() {
 	])
 
 	const handleExport = async () => {
-		if (cardRef.current && data) {
-			const filename = `workout-${format(data.date, "yyyy-MM-dd-HHmm")}.png`
-			await exportAsImage(cardRef.current, filename)
+		if (!cardRef.current || !data || isExporting) {
+			return
+		}
+
+		setIsExportPopoverVisible(true)
+		setIsExporting(true)
+		setExportError(null)
+
+		setExportedImageUrl(null)
+		setExportedImageBlob(null)
+
+		const filename = `workout-${format(data.date, "yyyy-MM-dd-HHmm")}.png`
+		setExportFilename(filename)
+
+		try {
+			const imageBlob = await exportAsImage(cardRef.current)
+			const imageDataUrl = await blobToDataUrl(imageBlob)
+			setExportedImageUrl(imageDataUrl)
+			setExportedImageBlob(imageBlob)
+		} catch (error) {
+			console.error("Export failed:", error)
+			setExportError("Failed to export image. Please try again.")
+		} finally {
+			setIsExporting(false)
 		}
 	}
 
+	const clearExportPreviewState = () => {
+		setExportedImageUrl(null)
+		setExportedImageBlob(null)
+		setExportFilename("")
+		setExportError(null)
+	}
+
+	const closeExportPreview = () => {
+		const popover = exportPopoverRef.current
+		if (
+			supportsPopoverApi &&
+			popover &&
+			"hidePopover" in popover &&
+			popover.matches(":popover-open")
+		) {
+			popover.hidePopover()
+		}
+		setIsExportPopoverVisible(false)
+		setIsExporting(false)
+		clearExportPreviewState()
+	}
+
+	const handleExportDownload = () => {
+		if (!exportedImageBlob || !exportFilename) {
+			return
+		}
+		downloadImage(exportedImageBlob, exportFilename)
+	}
+
 	const handleReset = () => {
+		closeExportPreview()
 		setFile(null)
 	}
+
+	useEffect(() => {
+		const popover = exportPopoverRef.current
+		if (!supportsPopoverApi || !popover || !("showPopover" in popover)) {
+			return
+		}
+
+		if (isExportPopoverVisible) {
+			if (!popover.matches(":popover-open")) {
+				popover.showPopover()
+			}
+			return
+		}
+
+		if (popover.matches(":popover-open")) {
+			popover.hidePopover()
+		}
+	}, [isExportPopoverVisible, supportsPopoverApi])
 
 	if (!data) {
 		return (
 			<div className="app">
+				<header className="app-header app-header-empty">
+					<div className="app-logo">humblebrag</div>
+				</header>
 				<FileUpload onFileSelect={setFile} loading={loading} error={error} />
 			</div>
 		)
@@ -199,16 +295,61 @@ function App() {
 
 	return (
 		<div className="app">
+			<header className="app-header">
+				<div className="app-logo">humblebrag</div>
+				<div className="app-header-actions">
+					<ExportButton
+						className="app-header-button"
+						onClick={handleExport}
+						disabled={isExporting}
+					/>
+					<button className="reset-button app-header-button" onClick={handleReset}>
+						Upload New File
+					</button>
+				</div>
+			</header>
+
 			<WorkoutCard ref={cardRef} data={data} settings={settings} />
 
 			<ThemeLabWidget settings={settings} onChange={setSettings} data={data} />
 
-			<div className="app-actions">
-				<ExportButton onClick={handleExport} />
-				<button className="reset-button" onClick={handleReset}>
-					Upload New File
-				</button>
-			</div>
+			{isExportPopoverVisible ? (
+				<div
+					ref={exportPopoverRef}
+					className="export-popover"
+					popover="auto"
+					onToggle={(event) => {
+						if (!supportsPopoverApi || !isExportPopoverVisible) {
+							return
+						}
+						const popover = event.currentTarget
+						if (!popover.matches(":popover-open")) {
+							setIsExportPopoverVisible(false)
+							setIsExporting(false)
+							clearExportPreviewState()
+						}
+					}}
+				>
+					<button className="export-popover-close" onClick={closeExportPreview}>
+						Close
+					</button>
+					{isExporting ? (
+						<div className="export-popover-loading" aria-live="polite">
+							<div className="export-popover-spinner" aria-hidden="true"></div>
+							<p className="export-popover-status">Rendering export image...</p>
+						</div>
+					) : exportedImageUrl ? (
+						<>
+							<img className="export-popover-image" src={exportedImageUrl} alt="Exported workout card" />
+							<button className="export-popover-download" onClick={handleExportDownload}>
+								Download Image
+							</button>
+						</>
+					) : exportError ? (
+						<p className="export-popover-error">{exportError}</p>
+					) : null}
+				</div>
+			) : null}
 		</div>
 	)
 }
