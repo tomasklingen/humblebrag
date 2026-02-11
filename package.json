@@ -5,11 +5,13 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
+		"prepare": "husky",
 		"typecheck": "tsc -b",
 		"build": "npm run typecheck && npm run build:bundle",
 		"build:bundle": "vite build",
 		"lint": "oxlint --type-aware .",
 		"stylelint": "stylelint \"src/**/*.css\"",
+		"format:check": "oxfmt --check .",
 		"format": "oxfmt --write .",
 		"preview": "vite preview"
 	},
@@ -19,6 +21,7 @@
 		"html-to-image": "^1.11.13",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
+		"react-is": "^19.2.4",
 		"recharts": "^3.7.0"
 	},
 	"devDependencies": {
@@ -26,6 +29,7 @@
 		"@types/react": "^19.2.13",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^5.1.4",
+		"husky": "^9.1.7",
 		"oxfmt": "^0.31.0",
 		"oxlint": "^1.46.0",
 		"oxlint-tsgolint": "^0.11.5",
