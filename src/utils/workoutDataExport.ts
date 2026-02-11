@@ -32,7 +32,9 @@ export function hasConfiguredDataCleanup(settings: CardSettings): boolean {
 export function applyCleanupAdjustments(
 	records: WorkoutRecord[],
 	settings: CardSettings,
+	sport: string,
 ): CleanupAdjustmentResult {
+	const isRunning = sport.toLowerCase().includes("running")
 	const trimEnd = settings.trimEndMinutes ?? Infinity
 
 	let adjusted = records.filter(
@@ -40,7 +42,9 @@ export function applyCleanupAdjustments(
 	)
 
 	if (settings.removeZeroPower) {
-		adjusted = removeZeroPower(adjusted)
+		adjusted = isRunning
+			? adjusted.filter((record) => record.speed !== undefined && record.speed > 0)
+			: removeZeroPower(adjusted)
 	}
 
 	if (settings.removeZeroHeartRate) {

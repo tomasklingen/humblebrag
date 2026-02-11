@@ -20,7 +20,7 @@ export const WorkoutCard = forwardRef<HTMLDivElement, WorkoutCardProps>(
 				</div>
 
 				<StatsPanel data={data} settings={settings} />
-				<PowerChart records={data.records} settings={settings} />
+				<PowerChart records={data.records} settings={settings} sport={data.sport} />
 
 				<div className="workout-card-footer">
 					<span className="footer-text">HUMBLEBRAG</span>

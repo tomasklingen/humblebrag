@@ -22,8 +22,8 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 	}
 
 	const powerMetrics = useMemo(
-		() => computePowerMetrics(data.records, data.duration, settings.functionalThresholdPower),
-		[data.records, data.duration, settings.functionalThresholdPower],
+		() => computePowerMetrics(data.records, data.duration, settings.functionalThresholdPower, data.sport),
+		[data.records, data.duration, settings.functionalThresholdPower, data.sport],
 	)
 
 	const isAdvancedMode = settings.statsDisplayMode === "advanced"
@@ -35,6 +35,9 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 	}
 
 	const classification = powerMetrics.classification
+	const isRunning = data.sport.toLowerCase().includes("running")
+	const classificationEmoji =
+		isRunning && classification.emoji === "🚴" ? "🏃" : classification.emoji
 
 	return (
 		<div className="stats-panel">
@@ -61,7 +64,7 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 				</div>
 				{isAdvancedMode && (
 					<div className="workout-classification">
-						<span className="classification-emoji">{classification.emoji}</span>
+						<span className="classification-emoji">{classificationEmoji}</span>
 						<div className="classification-content">
 							<div className="classification-type">{classification.type}</div>
 							<div className="classification-description">{classification.description}</div>

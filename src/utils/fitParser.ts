@@ -1,9 +1,28 @@
-import FitParser from "fit-file-parser"
-import type { FitFileData, WorkoutData, WorkoutRecord } from "../types/workout"
+import type { FitFileData, FitRecord, WorkoutData, WorkoutRecord } from "../types/workout"
+
+const SUPPORTED_SPORTS = new Set(["cycling", "running"])
+
+const asFiniteNumber = (value: unknown): number | undefined =>
+	typeof value === "number" && Number.isFinite(value) ? value : undefined
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+	typeof value === "object" && value !== null
+
+const readNumericField = (record: FitRecord, keys: string[]): number | undefined => {
+	const dynamicRecord: Record<string, unknown> = isRecord(record) ? record : {}
+	for (const key of keys) {
+		const value = asFiniteNumber(dynamicRecord[key])
+		if (value !== undefined) {
+			return value
+		}
+	}
+	return undefined
+}
 
 export async function parseFitFile(file: File): Promise<WorkoutData> {
 	// Read file as ArrayBuffer
 	const arrayBuffer = await file.arrayBuffer()
+	const { default: FitParser } = await import("fit-file-parser")
 
 	// Parse with fit-file-parser using async method
 	const fitParser = new FitParser({
@@ -36,10 +55,10 @@ function transformFitData(data: FitFileData): WorkoutData {
 
 	const session = sessions[0]
 
-	// Validate it's a cycling workout
+	// Validate supported workout sport
 	const sport = session.sport || "unknown"
-	if (sport.toLowerCase() !== "cycling") {
-		throw new Error(`Only cycling workouts are currently supported. Found: ${sport}`)
+	if (!SUPPORTED_SPORTS.has(sport.toLowerCase())) {
+		throw new Error(`Only cycling and running workouts are currently supported. Found: ${sport}`)
 	}
 
 	// Extract records (time series data)
@@ -52,28 +71,54 @@ function transformFitData(data: FitFileData): WorkoutData {
 	// Transform records into our format
 	const startTimeRaw = session.start_time || session.timestamp || new Date()
 	const startTime = startTimeRaw instanceof Date ? startTimeRaw : new Date(startTimeRaw)
-	const records: WorkoutRecord[] = fitRecords.map((record) => {
+	const records: WorkoutRecord[] = []
+	let previousTimestamp: Date | null = null
+	let previousDistanceKm: number | undefined
+
+	for (const record of fitRecords) {
 		const timestampRaw = record.timestamp || startTime
 		const timestamp = timestampRaw instanceof Date ? timestampRaw : new Date(timestampRaw)
 		const elapsedSeconds = (timestamp.getTime() - startTime.getTime()) / 1000
+		const distanceKm = readNumericField(record, ["distance", "enhanced_distance"])
 
-		return {
+		const sourceSpeedKmh = readNumericField(record, ["speed", "enhanced_speed"])
+		let derivedSpeedKmh: number | undefined
+
+		if (
+			sourceSpeedKmh === undefined &&
+			distanceKm !== undefined &&
+			previousDistanceKm !== undefined &&
+			previousTimestamp !== null
+		) {
+			const distanceDeltaKm = distanceKm - previousDistanceKm
+			const elapsedDeltaHours = (timestamp.getTime() - previousTimestamp.getTime()) / 3_600_000
+			if (distanceDeltaKm > 0 && elapsedDeltaHours > 0) {
+				derivedSpeedKmh = distanceDeltaKm / elapsedDeltaHours
+			}
+		}
+
+		records.push({
 			timestamp,
 			elapsedMinutes: elapsedSeconds / 60,
 			power: record.power,
 			targetPower: record.target_power,
 			heartRate: record.heart_rate,
-			speed: record.speed,
+			speed: sourceSpeedKmh ?? derivedSpeedKmh,
 			cadence: record.cadence,
-			distance: record.distance,
+			distance: distanceKm,
+		})
+
+		previousTimestamp = timestamp
+		if (distanceKm !== undefined) {
+			previousDistanceKm = distanceKm
 		}
-	})
+	}
 
 	// Build WorkoutData
 	const dateRaw = session.start_time || session.timestamp || new Date()
 	const date = dateRaw instanceof Date ? dateRaw : new Date(dateRaw)
 	const workoutData: WorkoutData = {
-		sport: session.sport || "cycling",
+		sport: session.sport || sport,
 		subSport: session.sub_sport || "",
 		date,
 		duration: session.total_elapsed_time || session.total_timer_time || 0,

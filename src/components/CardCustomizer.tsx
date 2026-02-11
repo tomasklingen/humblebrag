@@ -254,6 +254,10 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 		onChange({ ...settings, graphLineThickness: Number(e.target.value) })
 	}
 
+	const handleSmoothDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		onChange({ ...settings, smoothData: Number(e.target.value) })
+	}
+
 	const handleShowXAxisMarkersChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		onChange({ ...settings, showXAxisMarkers: e.target.checked })
 	}
@@ -514,21 +518,22 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 
 						<div className="customizer-group">
 							<h5>Data Cleanup</h5>
-							<div className="customizer-options">
-								<label className="customizer-toggle">
+							<div className="customizer-group-body">
+								<label className="theme-slider-row">
+									<span>Smooth Data</span>
 									<input
-										type="checkbox"
-										checked={settings.smoothData}
-										onChange={(e) => {
-											onChange({ ...settings, smoothData: e.target.checked })
-										}}
+										type="range"
+										min={0}
+										max={100}
+										step={1}
+										value={settings.smoothData}
+										onChange={handleSmoothDataChange}
+										className="theme-range"
 									/>
-									<span className="toggle-track">
-										<span className="toggle-thumb" />
-									</span>
-									<span className="toggle-label">Smooth Data</span>
+									<span>{settings.smoothData === 0 ? "off" : `${settings.smoothData}%`}</span>
 								</label>
-								<label className="customizer-toggle">
+								<div className="customizer-options">
+									<label className="customizer-toggle">
 									<input
 										type="checkbox"
 										checked={settings.removeZeroPower}
@@ -540,9 +545,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 										<span className="toggle-thumb" />
 									</span>
 									<span className="toggle-label">Remove Zero Power</span>
-								</label>
-								{hasHeartRate && (
-									<label className="customizer-toggle">
+									</label>
+									{hasHeartRate && (
+										<label className="customizer-toggle">
 										<input
 											type="checkbox"
 											checked={settings.removeZeroHeartRate}
@@ -554,8 +559,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 											<span className="toggle-thumb" />
 										</span>
 										<span className="toggle-label">Remove Zero Heart Rate</span>
-									</label>
-								)}
+										</label>
+									)}
+								</div>
 							</div>
 						</div>
 

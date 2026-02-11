@@ -26,7 +26,7 @@ const STORAGE_KEY = "humblebrag-settings"
 const defaultSettings: CardSettings = {
 	showHeartRate: true,
 	showTargetPower: true,
-	smoothData: false,
+	smoothData: 0,
 	removeZeroPower: false,
 	removeZeroHeartRate: false,
 	...DEFAULT_THEME_MODEL,
@@ -94,7 +94,13 @@ function loadSettings(): CardSettings {
 						? parsed.showTargetPower
 						: defaultSettings.showTargetPower,
 				smoothData:
-					typeof parsed.smoothData === "boolean" ? parsed.smoothData : defaultSettings.smoothData,
+					typeof parsed.smoothData === "boolean"
+						? parsed.smoothData
+							? 55
+							: 0
+						: isFiniteNumber(parsed.smoothData)
+							? Math.min(100, Math.max(0, parsed.smoothData))
+							: defaultSettings.smoothData,
 				removeZeroPower:
 					typeof parsed.removeZeroPower === "boolean"
 						? parsed.removeZeroPower
@@ -223,7 +229,7 @@ function App() {
 			return null
 		}
 
-		return applyCleanupAdjustments(data.records, settings)
+		return applyCleanupAdjustments(data.records, settings, data.sport)
 	}, [
 		data,
 		settings.removeZeroPower,

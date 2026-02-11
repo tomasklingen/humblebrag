@@ -94,7 +94,11 @@ export function classifyWorkout(
 	ftp: number,
 	normalizedPower: number,
 	variabilityIndex: number,
+	sport: string = "cycling",
 ): WorkoutClassification {
+	const isRunning = sport.toLowerCase().includes("running")
+	const sportRaceNoun = isRunning ? "on foot" : "on two wheels"
+
 	// If no FTP, provide generic classification
 	if (ftp === 0) {
 		const variability = calculateVariability(records)
@@ -124,7 +128,7 @@ export function classifyWorkout(
 	if (zones.recovery + zones.endurance > 80 && intensityFactor < 0.75) {
 		return {
 			type: "Active Recovery",
-			description: "Easy does it. Spinning the legs out, banking rest for the next one.",
+			description: "Easy does it. Keep it light today and bank freshness for the next hard one.",
 			emoji: "🧘",
 			zoneDistribution: zones,
 		}
@@ -185,7 +189,7 @@ export function classifyWorkout(
 	if (variabilityIndex > 1.1 && variability > 0.45) {
 		return {
 			type: "Race Day",
-			description: "Surges, attacks, recoveries. Controlled chaos on two wheels.",
+			description: `Surges, attacks, recoveries. Controlled chaos ${sportRaceNoun}.`,
 			emoji: "🏁",
 			zoneDistribution: zones,
 		}

@@ -96,6 +96,7 @@ export function computePowerMetrics(
 	records: WorkoutRecord[],
 	durationSeconds: number,
 	functionalThresholdPower: number = 0, // User's FTP (if known)
+	sport: string = "cycling",
 ): PowerMetrics {
 	const powerValues = records
 		.map((r) => r.power)
@@ -126,6 +127,7 @@ export function computePowerMetrics(
 		functionalThresholdPower,
 		normalizedPower,
 		variabilityIndex,
+		sport,
 	)
 
 	return {

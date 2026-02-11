@@ -15,6 +15,7 @@ import "./PowerChart.css"
 interface PowerChartProps {
 	records: WorkoutRecord[]
 	settings: CardSettings
+	sport: string
 }
 
 function computeTicks(min: number, max: number, interval: number): number[] {
@@ -26,7 +27,16 @@ function computeTicks(min: number, max: number, interval: number): number[] {
 	return ticks
 }
 
-export function PowerChart({ records, settings }: PowerChartProps) {
+const speedToPace = (speedKmh: number | undefined): number | undefined => {
+	if (!speedKmh || speedKmh <= 0) {
+		return undefined
+	}
+
+	return 60 / speedKmh
+}
+
+export function PowerChart({ records, settings, sport }: PowerChartProps) {
+	const isRunning = sport.toLowerCase().includes("running")
 	const useDistance = settings.xAxisMode === "distance"
 
 	// Apply trim filter first
@@ -40,63 +50,77 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 	const cleanedRecords = useMemo(() => {
 		let cleaned = trimmedRecords
 		if (settings.removeZeroPower) {
-			cleaned = removeZeroPower(cleaned)
+			cleaned = isRunning
+				? cleaned.filter((record) => record.speed !== undefined && record.speed > 0)
+				: removeZeroPower(cleaned)
 		}
 		if (settings.removeZeroHeartRate) {
 			cleaned = removeZeroHeartRate(cleaned)
 		}
-		if (settings.smoothData) {
-			cleaned = removeSpikes(cleaned)
+		if (settings.smoothData > 0) {
+			cleaned = removeSpikes(cleaned, settings.smoothData)
 		}
 		return cleaned
-	}, [trimmedRecords, settings.smoothData, settings.removeZeroPower, settings.removeZeroHeartRate])
+	}, [
+		trimmedRecords,
+		settings.smoothData,
+		settings.removeZeroPower,
+		settings.removeZeroHeartRate,
+		isRunning,
+	])
 
-	// Filter out records without power data and decimate for performance
-	const powerRecords = useMemo(() => {
-		const withPower = cleanedRecords.filter((r) => r.power !== undefined && r.power > 0)
-		if (withPower.length > 1000) {
-			const step = Math.ceil(withPower.length / 1000)
-			return withPower.filter((_, index) => index % step === 0)
+	// Filter out records without chart metric and decimate for performance
+	const metricRecords = useMemo(() => {
+		const withMetric = isRunning
+			? cleanedRecords.filter((r) => r.speed !== undefined && r.speed > 0)
+			: cleanedRecords.filter((r) => r.power !== undefined && r.power > 0)
+		if (withMetric.length > 1000) {
+			const step = Math.ceil(withMetric.length / 1000)
+			return withMetric.filter((_, index) => index % step === 0)
 		}
-		return withPower
-	}, [cleanedRecords])
+		return withMetric
+	}, [cleanedRecords, isRunning])
 
-	if (powerRecords.length === 0) {
+	if (metricRecords.length === 0) {
+		const noDataLabel = isRunning ? "pace" : "power"
 		return (
 			<div className="chart-container">
 				<div className="chart-header">
 					<div className="chart-header-accent" />
-					<h3>Power</h3>
+					<h3>{isRunning ? "Pace" : "Power"}</h3>
 				</div>
-				<div className="no-data">No power data available</div>
+				<div className="no-data">No {noDataLabel} data available</div>
 			</div>
 		)
 	}
 
 	// Check if data is available AND enabled in settings
 	const hasHeartRate =
-		settings.showHeartRate && powerRecords.some((r) => r.heartRate !== undefined && r.heartRate > 0)
+		settings.showHeartRate && metricRecords.some((r) => r.heartRate !== undefined && r.heartRate > 0)
+
+	const hasTargetPower =
+		!isRunning &&
+		settings.showTargetPower &&
+		metricRecords.some((r) => r.targetPower !== undefined && r.targetPower > 0)
 
 	// Prepare data for chart
-	const chartData = powerRecords.map((record) => ({
+	const chartData = metricRecords.map((record) => ({
 		time: Number(record.elapsedMinutes.toFixed(1)),
 		distance: record.distance !== undefined ? Number(record.distance.toFixed(2)) : undefined,
-		power: record.power,
+		metric: isRunning ? speedToPace(record.speed) : record.power,
 		targetPower: record.targetPower,
 		...(hasHeartRate ? { heartRate: record.heartRate } : {}),
 	}))
 
-	const maxPower = Math.max(
-		...powerRecords.map((r) => r.power ?? 0),
-		...powerRecords.map((r) => r.targetPower ?? 0),
+	const maxMetric = Math.max(
+		...chartData.map((point) => point.metric ?? 0),
+		...(hasTargetPower ? metricRecords.map((record) => record.targetPower ?? 0) : [0]),
 	)
-	const yAxisMax = Math.ceil((maxPower * 1.1) / 50) * 50
+	const yAxisMax = isRunning
+		? Math.max(0.5, Math.ceil(maxMetric * 2) / 2)
+		: Math.max(50, Math.ceil((maxMetric * 1.1) / 50) * 50)
 
-	const hasTargetPower =
-		settings.showTargetPower &&
-		powerRecords.some((r) => r.targetPower !== undefined && r.targetPower > 0)
-
-	const maxHR = hasHeartRate ? Math.max(...powerRecords.map((r) => r.heartRate ?? 0)) : 0
+	const maxHR = hasHeartRate ? Math.max(...metricRecords.map((r) => r.heartRate ?? 0)) : 0
 	const hrAxisMax = Math.ceil((maxHR * 1.1) / 10) * 10
 	const hrLineColor = "var(--color-error)"
 	const hrActiveDotColor = "var(--color-error-light)"
@@ -116,7 +140,7 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 		<div className="chart-container">
 			<div className="chart-header">
 				<div className="chart-header-accent" />
-				<h3>Power (W){hasHeartRate ? " / Heart Rate (bpm)" : ""}</h3>
+				<h3>{isRunning ? "Pace (min/km)" : "Power (W)"}{hasHeartRate ? " / Heart Rate (bpm)" : ""}</h3>
 			</div>
 			<ResponsiveContainer width="100%" height={300}>
 				<LineChart
@@ -164,7 +188,7 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 						yAxisId="power"
 						domain={[0, yAxisMax]}
 						label={{
-							value: "POWER (W)",
+							value: isRunning ? "PACE (MIN/KM)" : "POWER (W)",
 							angle: -90,
 							position: "insideLeft",
 							style: {
@@ -183,6 +207,7 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							fontFamily: "Helvetica Neue, Arial, sans-serif",
 						}}
 						tickLine={false}
+						tickFormatter={isRunning ? (value: number) => value.toFixed(1) : undefined}
 					/>
 					{hasHeartRate && (
 						<YAxis
@@ -225,6 +250,9 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							if (name === "heartRate") {
 								return [`${Math.round(value ?? 0)} bpm`, "Heart Rate"]
 							}
+							if (name === "metric" && isRunning) {
+								return [`${(value ?? 0).toFixed(2)} min/km`, "Pace"]
+							}
 							const label = name === "targetPower" ? "Target" : "Power"
 							return [`${Math.round(value ?? 0)}W`, label]
 						}}
@@ -248,14 +276,14 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 					)}
 					<Line
 						yAxisId="power"
-							type="monotone"
-							dataKey="power"
-							stroke="var(--color-primary)"
-							strokeWidth={lineThickness}
-							fill="url(#powerGradient)"
-							dot={false}
-							activeDot={{ r: 4, fill: "var(--color-accent)" }}
-						/>
+						type="monotone"
+						dataKey="metric"
+						stroke="var(--color-primary)"
+						strokeWidth={lineThickness}
+						fill="url(#powerGradient)"
+						dot={false}
+						activeDot={{ r: 4, fill: "var(--color-accent)" }}
+					/>
 					{hasHeartRate && (
 						<Line
 							yAxisId="hr"

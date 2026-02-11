@@ -29,7 +29,7 @@ export interface WorkoutRecord {
 export interface CardSettings {
 	showHeartRate: boolean
 	showTargetPower: boolean
-	smoothData: boolean
+	smoothData: number // 0..100 smoothing strength (0 = off)
 	removeZeroPower: boolean
 	removeZeroHeartRate: boolean
 	themeHue: number
@@ -93,6 +93,8 @@ export interface FitRecord {
 	target_power?: number
 	heart_rate?: number
 	speed?: number
+	enhanced_speed?: number
 	cadence?: number
 	distance?: number
+	enhanced_distance?: number
 }
