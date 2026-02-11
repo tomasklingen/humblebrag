@@ -306,8 +306,8 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 	const handleFTPChange = (e: React.ChangeEvent<HTMLInputElement>) =>
 		onChange({ ...settings, functionalThresholdPower: Number(e.target.value) || 0 })
 
-	const handleShowPowerRecordsChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-		onChange({ ...settings, showPowerRecords: e.target.checked })
+	const handleShowPowerBestEffortsChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		onChange({ ...settings, showPowerBestEfforts: e.target.checked })
 
 	const handleShowHeartRateChange = (e: React.ChangeEvent<HTMLInputElement>) =>
 		onChange({ ...settings, showHeartRate: e.target.checked })
@@ -395,13 +395,13 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 								<label className="customizer-toggle">
 									<input
 										type="checkbox"
-										checked={settings.showPowerRecords}
-										onChange={handleShowPowerRecordsChange}
+										checked={settings.showPowerBestEfforts}
+										onChange={handleShowPowerBestEffortsChange}
 									/>
 									<span className="toggle-track">
 										<span className="toggle-thumb" />
 									</span>
-									<span className="toggle-label">Show Power Records</span>
+									<span className="toggle-label">Show Power Best Efforts</span>
 								</label>
 							) : null}
 						</div>

@@ -107,7 +107,7 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 
 			{isAdvancedMode ? (
 				<div className="stats-grid">
-					{settings.showPowerRecords && (
+					{settings.showPowerBestEfforts && (
 						<>
 							<div className="stat-item">
 								<div className="stat-label">1min Power</div>

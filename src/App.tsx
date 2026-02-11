@@ -35,7 +35,7 @@ const defaultSettings: CardSettings = {
 	trimStartMinutes: 0,
 	trimEndMinutes: null,
 	statsDisplayMode: "advanced",
-	showPowerRecords: true,
+	showPowerBestEfforts: true,
 	functionalThresholdPower: 0,
 	graphLineThickness: 1.2,
 	showXAxisMarkers: true,
@@ -148,10 +148,12 @@ function loadSettings(): CardSettings {
 					parsed.statsDisplayMode === "basic" || parsed.statsDisplayMode === "advanced"
 						? parsed.statsDisplayMode
 						: defaultSettings.statsDisplayMode,
-				showPowerRecords:
-					typeof parsed.showPowerRecords === "boolean"
-						? parsed.showPowerRecords
-						: defaultSettings.showPowerRecords,
+				showPowerBestEfforts:
+					typeof parsed.showPowerBestEfforts === "boolean"
+						? parsed.showPowerBestEfforts
+						: typeof parsed.showPowerRecords === "boolean"
+							? parsed.showPowerRecords
+							: defaultSettings.showPowerBestEfforts,
 				functionalThresholdPower: isFiniteNumber(parsed.functionalThresholdPower)
 					? parsed.functionalThresholdPower
 					: defaultSettings.functionalThresholdPower,
@@ -187,7 +189,7 @@ function saveSettings(settings: CardSettings): void {
 			xAxisMode: settings.xAxisMode,
 			xAxisInterval: settings.xAxisInterval,
 			statsDisplayMode: settings.statsDisplayMode,
-			showPowerRecords: settings.showPowerRecords,
+			showPowerBestEfforts: settings.showPowerBestEfforts,
 			functionalThresholdPower: settings.functionalThresholdPower,
 			graphLineThickness: settings.graphLineThickness,
 			showXAxisMarkers: settings.showXAxisMarkers,
