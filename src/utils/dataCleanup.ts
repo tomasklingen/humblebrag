@@ -4,12 +4,17 @@ const MIN_WINDOW_HALF = 2
 const MAX_WINDOW_HALF = 12
 const MIN_THRESHOLD = 1.05
 const MAX_THRESHOLD = 2.2
+const MIN_SMOOTH_WINDOW_HALF = 1
+const MAX_SMOOTH_WINDOW_HALF = 24
 
 const clamp = (value: number, min: number, max: number): number =>
 	Math.min(Math.max(value, min), max)
 
 const toStrengthRatio = (smoothingStrength: number): number =>
 	clamp(smoothingStrength, 0, 100) / 100
+
+const blend = (source: number, target: number, amount: number): number =>
+	source + (target - source) * amount
 
 /**
  * Computes the median of an array of numbers.
@@ -42,6 +47,32 @@ function getWindowMedian(
 	}
 
 	return values.length > 0 ? median(values) : undefined
+}
+
+function getWindowAverage(
+	records: WorkoutRecord[],
+	index: number,
+	field: "power" | "heartRate" | "speed",
+	windowHalf: number,
+): number | undefined {
+	const start = Math.max(0, index - windowHalf)
+	const end = Math.min(records.length - 1, index + windowHalf)
+
+	let sum = 0
+	let count = 0
+	for (let i = start; i <= end; i++) {
+		const value = records[i][field]
+		if (value !== undefined) {
+			sum += value
+			count++
+		}
+	}
+
+	if (count === 0) {
+		return undefined
+	}
+
+	return sum / count
 }
 
 /**
@@ -93,7 +124,7 @@ export function removeSpikes(records: WorkoutRecord[], smoothingStrength: number
 	const windowHalf = Math.round(MIN_WINDOW_HALF + (MAX_WINDOW_HALF - MIN_WINDOW_HALF) * strength)
 	const threshold = MAX_THRESHOLD - (MAX_THRESHOLD - MIN_THRESHOLD) * strength
 
-	return records.map((record, index) => {
+	const spikeFilteredRecords = records.map((record, index) => {
 		let power = record.power
 		let heartRate = record.heartRate
 		let speed = record.speed
@@ -128,4 +159,53 @@ export function removeSpikes(records: WorkoutRecord[], smoothingStrength: number
 
 		return { ...record, power, heartRate, speed }
 	})
+
+	const smoothBlend = strength * strength
+	const smoothWindowHalf = Math.round(
+		MIN_SMOOTH_WINDOW_HALF +
+			(MAX_SMOOTH_WINDOW_HALF - MIN_SMOOTH_WINDOW_HALF) * Math.pow(strength, 1.2),
+	)
+
+	if (smoothBlend <= 0) {
+		return spikeFilteredRecords
+	}
+
+	const smoothedRecords: WorkoutRecord[] = []
+
+	for (let index = 0; index < spikeFilteredRecords.length; index++) {
+		const record = spikeFilteredRecords[index]
+		let power = record.power
+		let heartRate = record.heartRate
+		let speed = record.speed
+
+		if (power !== undefined) {
+			const avg = getWindowAverage(spikeFilteredRecords, index, "power", smoothWindowHalf)
+			if (avg !== undefined) {
+				power = blend(power, avg, smoothBlend)
+			}
+		}
+
+		if (heartRate !== undefined) {
+			const avg = getWindowAverage(spikeFilteredRecords, index, "heartRate", smoothWindowHalf)
+			if (avg !== undefined) {
+				heartRate = blend(heartRate, avg, smoothBlend)
+			}
+		}
+
+		if (speed !== undefined) {
+			const avg = getWindowAverage(spikeFilteredRecords, index, "speed", smoothWindowHalf)
+			if (avg !== undefined) {
+				speed = blend(speed, avg, smoothBlend)
+			}
+		}
+
+		if (power === record.power && heartRate === record.heartRate && speed === record.speed) {
+			smoothedRecords.push(record)
+			continue
+		}
+
+		smoothedRecords.push(Object.assign({}, record, { power, heartRate, speed }))
+	}
+
+	return smoothedRecords
 }
