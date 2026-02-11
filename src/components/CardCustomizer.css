@@ -1,10 +1,6 @@
 .card-customizer {
-	max-width: 800px;
-	margin: 1rem auto;
-	padding: 1.25rem 1.5rem;
-	background: var(--color-surface);
-	border-radius: var(--radius-lg);
-	border: 1px solid var(--color-border);
+	display: grid;
+	gap: 1.1rem;
 	color: var(--color-text);
 }
 
@@ -18,94 +14,114 @@
 }
 
 .card-customizer-header {
-	margin-bottom: 0.9rem;
+	margin-bottom: 0.25rem;
 }
 
 .card-customizer-header p {
-	margin: -0.35rem 0 0;
+	margin: -0.2rem 0 0;
 	font-size: 0.8rem;
 	color: var(--color-text-secondary);
 }
 
-.customizer-tabs {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 0.4rem;
-	padding: 0.35rem;
-	border: 1px solid var(--color-border);
-	border-radius: var(--radius-md);
-	background: color-mix(in oklch, var(--color-surface-hover) 55%, transparent);
-	margin-bottom: 0.9rem;
-}
-
-.customizer-tabs button {
-	padding: 0.45rem 0.6rem;
-	border: 1px solid transparent;
-	border-radius: var(--radius-sm);
-	background: transparent;
-	color: var(--color-text-muted);
-	font-size: var(--text-body);
-	font-weight: var(--weight-semibold);
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	cursor: pointer;
-	transition: all var(--transition-fast);
-}
-
-.customizer-tabs button.active {
-	background: color-mix(in oklch, var(--color-primary) 26%, var(--color-surface));
-	border-color: color-mix(in oklch, var(--color-primary) 50%, var(--color-border));
-	color: var(--color-text);
-}
-
-.customizer-tab-panel {
-	display: grid;
-	gap: 0.65rem;
-}
-
-.customizer-accordion {
-	border: 1px solid var(--color-border);
-	border-radius: var(--radius-md);
-	background: color-mix(in oklch, var(--color-surface-hover) 35%, transparent);
-	overflow: hidden;
-}
-
-.customizer-accordion-title {
-	list-style: none;
-	cursor: pointer;
-	padding: 0.65rem 0.8rem;
-	font-size: var(--text-body);
-	font-weight: var(--weight-semibold);
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	color: color-mix(in oklch, var(--color-text) 86%, var(--color-background));
-	user-select: none;
+.customizer-section-block {
 	position: relative;
-	padding-right: 2.2rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
 }
 
-.customizer-accordion-title::-webkit-details-marker {
-	display: none;
+.customizer-section-block + .customizer-section-block {
+	padding-top: 1rem;
+	border-top: 1px solid color-mix(in oklch, var(--color-border) 72%, transparent);
 }
 
-.customizer-accordion-title::after {
+.customizer-section-toggle {
+	width: 100%;
+	display: grid;
+	gap: 0.28rem;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	text-align: left;
+	cursor: pointer;
+}
+
+.customizer-section-toggle span {
+	font-size: 0.75rem;
+	font-weight: var(--weight-bold);
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: color-mix(in oklch, var(--color-text) 88%, var(--color-background));
+}
+
+.customizer-section-toggle small {
+	font-size: 0.74rem;
+	line-height: 1.35;
+	color: var(--color-text-muted);
+}
+
+.customizer-section-toggle::after {
 	content: "+";
 	position: absolute;
-	right: 0.85rem;
-	top: 50%;
-	transform: translateY(-50%);
-	font-size: 0.95rem;
+	right: 0;
+	top: 0;
+	font-size: 1rem;
 	font-weight: var(--weight-bold);
 	color: var(--color-text-secondary);
 }
 
-.customizer-accordion[open] > .customizer-accordion-title::after {
+.customizer-section-toggle.active::after {
 	content: "-";
 }
 
-.customizer-accordion-body {
-	padding: 0.15rem 0.8rem 0.85rem;
-	border-top: 1px solid color-mix(in oklch, var(--color-border) 80%, transparent);
+.customizer-section-panel {
+	display: grid;
+	gap: 0.85rem;
+	margin-top: 0.7rem;
+	max-height: 0;
+	opacity: 0;
+	overflow: hidden;
+	pointer-events: none;
+	transform: translateY(-6px);
+	transition:
+		max-height 360ms cubic-bezier(0.87, 0, 0.13, 1),
+		opacity 260ms cubic-bezier(0.87, 0, 0.13, 1),
+		transform 360ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.customizer-section-panel.is-open {
+	max-height: 2200px;
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateY(0);
+}
+
+.customizer-group {
+	display: grid;
+	gap: 0.4rem;
+}
+
+.customizer-group h5 {
+	margin: 0;
+	font-size: 0.66rem;
+	font-weight: var(--weight-bold);
+	text-transform: uppercase;
+	letter-spacing: 0.11em;
+	color: var(--color-text-secondary);
+}
+
+.customizer-group-body {
+	display: grid;
+	gap: 0.65rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.customizer-section-panel,
+	.customizer-section-panel.is-open {
+		transition: none;
+		transform: none;
+	}
 }
 
 .customizer-options {
@@ -616,13 +632,15 @@
 	}
 
 	.customizer-tabs {
-		gap: 0.3rem;
-		padding: 0.3rem;
+		display: none;
 	}
 
-	.customizer-tabs button {
-		padding: 0.4rem 0.45rem;
-		font-size: 0.62rem;
+	.customizer-section-block {
+		padding: 0;
+	}
+
+	.customizer-section-block + .customizer-section-block {
+		padding-top: 0.85rem;
 	}
 
 	.customizer-accordion-title {

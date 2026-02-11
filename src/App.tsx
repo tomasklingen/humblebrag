@@ -1,5 +1,6 @@
 import { format } from "date-fns"
 import { useEffect, useMemo, useRef, useState } from "react"
+import type { CSSProperties } from "react"
 import "./App.css"
 import { ExportButton } from "./components/ExportButton"
 import { FileUpload } from "./components/FileUpload"
@@ -8,6 +9,11 @@ import { WorkoutCard } from "./components/WorkoutCard"
 import { useFitParser } from "./hooks/useFitParser"
 import type { CardSettings } from "./types/workout"
 import { downloadImage, exportAsImage } from "./utils/imageExport"
+import {
+	applyCleanupAdjustments,
+	downloadAdjustedWorkoutCsv,
+	hasConfiguredDataCleanup,
+} from "./utils/workoutDataExport"
 import {
 	DEFAULT_THEME_MODEL,
 	createThemePalette,
@@ -31,6 +37,8 @@ const defaultSettings: CardSettings = {
 	statsDisplayMode: "advanced",
 	showPowerRecords: true,
 	functionalThresholdPower: 0,
+	graphLineThickness: 1.2,
+	showXAxisMarkers: true,
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -54,6 +62,8 @@ const blobToDataUrl = async (blob: Blob): Promise<string> =>
 		})
 		reader.readAsDataURL(blob)
 	})
+
+type ThemeCanvasStyle = CSSProperties & Record<`--${string}`, string>
 
 function loadSettings(): CardSettings {
 	try {
@@ -113,6 +123,13 @@ function loadSettings(): CardSettings {
 				functionalThresholdPower: isFiniteNumber(parsed.functionalThresholdPower)
 					? parsed.functionalThresholdPower
 					: defaultSettings.functionalThresholdPower,
+				graphLineThickness: isFiniteNumber(parsed.graphLineThickness)
+					? parsed.graphLineThickness
+					: defaultSettings.graphLineThickness,
+				showXAxisMarkers:
+					typeof parsed.showXAxisMarkers === "boolean"
+						? parsed.showXAxisMarkers
+						: defaultSettings.showXAxisMarkers,
 			}
 		}
 	} catch (error) {
@@ -140,6 +157,8 @@ function saveSettings(settings: CardSettings): void {
 			statsDisplayMode: settings.statsDisplayMode,
 			showPowerRecords: settings.showPowerRecords,
 			functionalThresholdPower: settings.functionalThresholdPower,
+			graphLineThickness: settings.graphLineThickness,
+			showXAxisMarkers: settings.showXAxisMarkers,
 		}
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
 	} catch (error) {
@@ -178,29 +197,47 @@ function App() {
 		],
 	)
 
+	const canvasThemeStyle = useMemo<ThemeCanvasStyle>(
+		() => ({
+			"--color-primary": themePalette.primary,
+			"--color-accent": themePalette.accent,
+			"--color-background": themePalette.background,
+			"--color-surface": themePalette.surface,
+			"--color-surface-hover": themePalette.surfaceHover,
+			"--color-border": themePalette.border,
+			"--color-text": themePalette.text,
+		}),
+		[
+			themePalette.primary,
+			themePalette.accent,
+			themePalette.background,
+			themePalette.surface,
+			themePalette.surfaceHover,
+			themePalette.border,
+			themePalette.text,
+		],
+	)
+
+	const cleanupAdjustmentResult = useMemo(() => {
+		if (!data) {
+			return null
+		}
+
+		return applyCleanupAdjustments(data.records, settings)
+	}, [
+		data,
+		settings.removeZeroPower,
+		settings.removeZeroHeartRate,
+		settings.trimStartMinutes,
+		settings.trimEndMinutes,
+	])
+
+	const shouldShowAdjustedDataDownload = hasConfiguredDataCleanup(settings)
+
 	// Save settings to localStorage whenever they change
 	useEffect(() => {
 		saveSettings(settings)
 	}, [settings])
-
-	useEffect(() => {
-		const root = document.documentElement
-		root.style.setProperty("--color-primary", themePalette.primary)
-		root.style.setProperty("--color-accent", themePalette.accent)
-		root.style.setProperty("--color-background", themePalette.background)
-		root.style.setProperty("--color-surface", themePalette.surface)
-		root.style.setProperty("--color-surface-hover", themePalette.surfaceHover)
-		root.style.setProperty("--color-border", themePalette.border)
-		root.style.setProperty("--color-text", themePalette.text)
-	}, [
-		themePalette.primary,
-		themePalette.accent,
-		themePalette.background,
-		themePalette.surface,
-		themePalette.surfaceHover,
-		themePalette.border,
-		themePalette.text,
-	])
 
 	const handleExport = async () => {
 		if (!cardRef.current || !data || isExporting) {
@@ -264,6 +301,30 @@ function App() {
 		setFile(null)
 	}
 
+	const handleAdjustedDataDownload = () => {
+		if (!file || !cleanupAdjustmentResult) {
+			return
+		}
+
+		if (!cleanupAdjustmentResult.changed) {
+			alert("No records changed with the current trim/remove-zero settings.")
+			return
+		}
+
+		const confirmed = window.confirm(
+			`This will download only the adjusted workout data (${cleanupAdjustmentResult.removedCount} records removed). The original FIT file stays unchanged. Continue?`,
+		)
+
+		if (!confirmed) {
+			return
+		}
+
+		const baseName = file.name.toLowerCase().endsWith(".fit")
+			? file.name.slice(0, -4)
+			: file.name
+		downloadAdjustedWorkoutCsv(cleanupAdjustmentResult.records, `${baseName}-adjusted.csv`)
+	}
+
 	useEffect(() => {
 		const popover = exportPopoverRef.current
 		if (!supportsPopoverApi || !popover || !("showPopover" in popover)) {
@@ -298,6 +359,11 @@ function App() {
 			<header className="app-header">
 				<div className="app-logo">humblebrag</div>
 				<div className="app-header-actions">
+					{shouldShowAdjustedDataDownload ? (
+						<button className="reset-button data-download-button" onClick={handleAdjustedDataDownload}>
+							Download Updated Data
+						</button>
+					) : null}
 					<ExportButton
 						className="app-header-button"
 						onClick={handleExport}
@@ -309,9 +375,22 @@ function App() {
 				</div>
 			</header>
 
-			<WorkoutCard ref={cardRef} data={data} settings={settings} />
+			<div className="app-workspace">
+				<aside className="app-sidebar" aria-label="Customization sidebar">
+					<ThemeLabWidget settings={settings} onChange={setSettings} data={data} />
+				</aside>
 
-			<ThemeLabWidget settings={settings} onChange={setSettings} data={data} />
+				<main className="app-canvas-area">
+					<div className="app-canvas-panel">
+						<WorkoutCard
+							ref={cardRef}
+							data={data}
+							settings={settings}
+							themeStyle={canvasThemeStyle}
+						/>
+					</div>
+				</main>
+			</div>
 
 			{isExportPopoverVisible ? (
 				<div
@@ -333,6 +412,7 @@ function App() {
 					<button className="export-popover-close" onClick={closeExportPreview}>
 						Close
 					</button>
+					<p className="export-popover-title">Radddd! Nice work.</p>
 					{isExporting ? (
 						<div className="export-popover-loading" aria-live="polite">
 							<div className="export-popover-spinner" aria-hidden="true"></div>
@@ -340,7 +420,10 @@ function App() {
 						</div>
 					) : exportedImageUrl ? (
 						<>
-							<img className="export-popover-image" src={exportedImageUrl} alt="Exported workout card" />
+							<div className="export-polaroid">
+								<img className="export-popover-image" src={exportedImageUrl} alt="Exported workout card" />
+								<p className="export-polaroid-caption">humblebrag</p>
+							</div>
 							<button className="export-popover-download" onClick={handleExportDownload}>
 								Download Image
 							</button>

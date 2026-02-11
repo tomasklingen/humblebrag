@@ -101,6 +101,7 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 	const hrLineColor = "var(--color-error)"
 	const hrActiveDotColor = "var(--color-error-light)"
 	const hrAxisColor = hrLineColor
+	const lineThickness = Math.min(Math.max(settings.graphLineThickness, 0.6), 3)
 
 	// Compute custom x-axis ticks when interval is set
 	const xKey = useDistance ? "distance" : "time"
@@ -128,7 +129,11 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							<stop offset="100%" stopColor="var(--color-primary)" stopOpacity={0.1} />
 						</linearGradient>
 					</defs>
-					<CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+					<CartesianGrid
+						strokeDasharray="3 3"
+						stroke="var(--color-border)"
+						vertical={settings.showXAxisMarkers}
+					/>
 					<XAxis
 						dataKey={xKey}
 						label={{
@@ -235,7 +240,7 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							type="monotone"
 							dataKey="targetPower"
 							stroke="var(--color-text-muted)"
-							strokeWidth={1.5}
+							strokeWidth={lineThickness}
 							strokeDasharray="5 5"
 							dot={false}
 							activeDot={{ r: 4, fill: "var(--color-text-secondary)" }}
@@ -243,21 +248,21 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 					)}
 					<Line
 						yAxisId="power"
-						type="monotone"
-						dataKey="power"
-						stroke="var(--color-primary)"
-						strokeWidth={1.2}
-						fill="url(#powerGradient)"
-						dot={false}
-						activeDot={{ r: 4, fill: "var(--color-accent)" }}
-					/>
+							type="monotone"
+							dataKey="power"
+							stroke="var(--color-primary)"
+							strokeWidth={lineThickness}
+							fill="url(#powerGradient)"
+							dot={false}
+							activeDot={{ r: 4, fill: "var(--color-accent)" }}
+						/>
 					{hasHeartRate && (
 						<Line
 							yAxisId="hr"
 							type="monotone"
 							dataKey="heartRate"
 							stroke={hrLineColor}
-							strokeWidth={1.2}
+							strokeWidth={lineThickness}
 							dot={false}
 							activeDot={{ r: 4, fill: hrActiveDotColor }}
 						/>

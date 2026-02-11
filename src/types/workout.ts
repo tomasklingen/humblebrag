@@ -44,6 +44,8 @@ export interface CardSettings {
 	statsDisplayMode: "basic" | "advanced" // basic = simple stats, advanced = pro metrics
 	showPowerRecords: boolean // Show best-effort power record stats in advanced mode
 	functionalThresholdPower: number // User's FTP in watts (0 = not set)
+	graphLineThickness: number // Line thickness for chart series
+	showXAxisMarkers: boolean // Show vertical x-axis marker grid lines
 }
 
 // Raw FIT file data structure from fit-file-parser

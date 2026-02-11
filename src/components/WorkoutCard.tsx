@@ -1,4 +1,5 @@
 import { forwardRef } from "react"
+import type { CSSProperties } from "react"
 import type { CardSettings, WorkoutData } from "../types/workout"
 import { PowerChart } from "./PowerChart"
 import { StatsPanel } from "./StatsPanel"
@@ -7,12 +8,13 @@ import "./WorkoutCard.css"
 interface WorkoutCardProps {
 	data: WorkoutData
 	settings: CardSettings
+	themeStyle?: CSSProperties
 }
 
 export const WorkoutCard = forwardRef<HTMLDivElement, WorkoutCardProps>(
-	({ data, settings }, ref) => {
+	({ data, settings, themeStyle }, ref) => {
 		return (
-			<div ref={ref} className="workout-card">
+			<div ref={ref} className="workout-card" style={themeStyle}>
 				<div className="workout-card-header">
 					<span className="header-brand">HUMBLEBRAG</span>
 				</div>

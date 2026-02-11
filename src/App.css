@@ -1,6 +1,8 @@
 .app {
 	min-height: 100vh;
-	padding: 1rem;
+	padding: 1rem 1.25rem 1.5rem;
+	display: grid;
+	gap: 1rem;
 }
 
 .app-header {
@@ -8,13 +10,13 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	max-width: 1100px;
+	width: min(100%, 1400px);
 	margin: 0 auto;
-	padding: 0.75rem 1rem;
-	border: 1px solid var(--color-border, #475569);
-	background: color-mix(in oklch, var(--color-surface, #1e293b) 80%, transparent);
-	backdrop-filter: blur(8px);
-	border-radius: 14px;
+	padding: 0.25rem 0;
+	border: none;
+	background: transparent;
+	backdrop-filter: none;
+	border-radius: 0;
 }
 
 .app-header-empty {
@@ -22,11 +24,46 @@
 	margin-bottom: 1.5rem;
 }
 
+.app-workspace {
+	width: min(100%, 1400px);
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+	gap: 1rem;
+	align-items: start;
+}
+
+.app-sidebar {
+	position: sticky;
+	top: 1rem;
+	align-self: start;
+	min-width: 0;
+}
+
+.app-canvas-area {
+	min-width: 0;
+}
+
+.app-canvas-panel {
+	padding: 1rem;
+	border: 1px solid var(--color-border, #475569);
+	border-radius: 14px;
+	background: color-mix(in oklch, var(--color-surface, #1e293b) 40%, transparent);
+	box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--color-border, #475569) 35%, transparent);
+	overflow: auto;
+}
+
+.app-canvas-panel .workout-card {
+	width: 100%;
+	max-width: none;
+	margin: 0;
+}
+
 .app-logo {
 	font-family: var(--font-display);
-	font-size: 0.9rem;
+	font-size: 0.82rem;
 	font-weight: var(--weight-extrabold);
-	letter-spacing: var(--tracking-wider);
+	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: var(--color-text);
 }
@@ -34,29 +71,53 @@
 .app-header-actions {
 	display: flex;
 	align-items: center;
-	gap: 1rem;
+	gap: 0.55rem;
 }
 
 .app-header-button {
-	min-height: 44px;
+	min-height: 34px;
 }
 
 .reset-button {
-	padding: 0.75rem 1.5rem;
-	font-size: 0.875rem;
-	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.45rem;
+	padding: 0.45rem 0.85rem;
+	font-size: 0.72rem;
+	font-weight: var(--weight-semibold);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	line-height: 1;
 	color: var(--color-text-secondary, #94a3b8);
-	background: transparent;
+	background: color-mix(in oklch, var(--color-surface, #1e293b) 35%, transparent);
 	border: 1px solid var(--color-border, #475569);
-	border-radius: 8px;
+	border-radius: 999px;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition:
+		transform 160ms ease,
+		color 160ms ease,
+		border-color 160ms ease,
+		background-color 160ms ease;
 }
 
 .reset-button:hover {
 	color: var(--color-text, #f1f5f9);
-	border-color: var(--color-text-secondary, #94a3b8);
-	background: var(--color-surface, #1e293b);
+	border-color: color-mix(in oklch, var(--color-text-secondary, #94a3b8) 65%, var(--color-border, #475569));
+	background: color-mix(in oklch, var(--color-surface-hover, #334155) 55%, transparent);
+	transform: translateY(-1px);
+}
+
+.data-download-button {
+	color: color-mix(in oklch, var(--color-primary, #22d3ee) 70%, var(--color-text, #f1f5f9));
+	border-color: color-mix(in oklch, var(--color-primary, #22d3ee) 40%, var(--color-border, #475569));
+	background: color-mix(in oklch, var(--color-primary, #22d3ee) 12%, transparent);
+}
+
+.data-download-button:hover {
+	color: color-mix(in oklch, var(--color-primary, #22d3ee) 85%, var(--color-text, #f1f5f9));
+	border-color: color-mix(in oklch, var(--color-primary, #22d3ee) 62%, var(--color-border, #475569));
+	background: color-mix(in oklch, var(--color-primary, #22d3ee) 20%, transparent);
 }
 
 .export-popover {
@@ -68,7 +129,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 1rem;
+	gap: 1.35rem;
 	padding: 1rem;
 	border-radius: 16px;
 	background: var(--color-background, #0f172a);
@@ -83,6 +144,7 @@
 
 .export-popover-close {
 	align-self: flex-end;
+	margin-bottom: 0.25rem;
 	padding: 0.45rem 0.7rem;
 	font-size: var(--text-caption);
 	font-weight: var(--weight-semibold);
@@ -95,18 +157,53 @@
 	cursor: pointer;
 }
 
+.export-popover-title {
+	margin: -0.15rem 0 0.2rem;
+	font-family: var(--font-display);
+	font-size: 0.98rem;
+	font-weight: var(--weight-extrabold);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--color-accent, #fbbf24);
+}
+
 .export-popover-image {
 	width: min(100%, 560px);
 	aspect-ratio: 1;
 	object-fit: contain;
-	border-radius: 12px;
-	border: 1px solid var(--color-border, #475569);
+	border-radius: 2px;
+	border: 1px solid #d8d8d8;
 	background: var(--color-background, #0f172a);
+}
+
+.export-polaroid {
+	width: min(100%, 560px);
+	margin: 0.4rem 0 0.5rem;
+	padding: 0.9rem 0.9rem 1.25rem;
+	background: #fff;
+	border-radius: 4px;
+	border: 1px solid #ececec;
+	transform: rotate(-2.2deg);
+	box-shadow:
+		0 12px 24px rgb(15 23 42 / 28%),
+		0 2px 3px rgb(15 23 42 / 18%);
+}
+
+.export-polaroid-caption {
+	margin-top: 0.8rem;
+	font-family: var(--font-display);
+	font-size: 0.78rem;
+	font-weight: var(--weight-semibold);
+	letter-spacing: 0.16em;
+	text-align: center;
+	text-transform: uppercase;
+	color: #2c2c2c;
 }
 
 .export-popover-download {
 	width: 100%;
 	max-width: 300px;
+	margin-top: 0.25rem;
 	padding: 0.85rem 1rem;
 	font-size: 0.95rem;
 	font-weight: var(--weight-semibold);
@@ -171,6 +268,16 @@
 	}
 }
 
+@media (width <= 1080px) {
+	.app-workspace {
+		grid-template-columns: 1fr;
+	}
+
+	.app-sidebar {
+		position: static;
+	}
+}
+
 @media (width <= 768px) {
 	.app {
 		padding: 0.5rem;
@@ -179,6 +286,18 @@
 	.app-header {
 		flex-direction: column;
 		align-items: stretch;
+	}
+
+	.app-workspace {
+		grid-template-columns: 1fr;
+	}
+
+	.app-sidebar {
+		position: static;
+	}
+
+	.app-canvas-panel {
+		padding: 0.5rem;
 	}
 
 	.app-logo {
@@ -197,6 +316,10 @@
 
 	.export-popover {
 		padding: 0.75rem;
+	}
+
+	.export-polaroid {
+		transform: rotate(-1.5deg);
 	}
 
 	.export-popover-loading {

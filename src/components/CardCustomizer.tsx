@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { CardSettings, ThemeHarmony, WorkoutData } from "../types/workout"
 import { DEFAULT_THEME_MODEL, createThemePalette, getHarmonyShift } from "../utils/themePalette"
 import { DualRangeSlider } from "./DualRangeSlider"
@@ -36,7 +36,9 @@ const HARMONY_OPTIONS = [
 ] as const satisfies ReadonlyArray<{ value: ThemeHarmony; label: string; detail: string }>
 
 type ComposerNodeId = "background" | "surface" | "primary" | "accent"
-type CustomizerTab = "general" | "chart" | "theme"
+type SidebarSection = "general" | "chart" | "theme"
+
+const CLOSE_BEFORE_OPEN_MS = 210
 
 interface ComposerNode {
 	id: ComposerNodeId
@@ -62,8 +64,9 @@ const clamp = (value: number, min: number, max: number): number =>
 	Math.min(Math.max(value, min), max)
 
 export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps) {
-	const [activeTab, setActiveTab] = useState<CustomizerTab>("general")
 	const activeFieldPointerId = useRef<number | null>(null)
+	const sectionTransitionTimer = useRef<number | null>(null)
+	const [activeSection, setActiveSection] = useState<SidebarSection | null>("general")
 
 	const hasHeartRate = data.avgHeartRate > 0
 	const hasTargetPower = data.records.some((r) => r.targetPower !== undefined && r.targetPower > 0)
@@ -247,6 +250,14 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 		onChange({ ...settings, themeContrast: Number(e.target.value) })
 	}
 
+	const handleGraphLineThicknessChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		onChange({ ...settings, graphLineThickness: Number(e.target.value) })
+	}
+
+	const handleShowXAxisMarkersChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		onChange({ ...settings, showXAxisMarkers: e.target.checked })
+	}
+
 	const handleThemeHarmonyChange = (harmony: ThemeHarmony) => {
 		onChange({ ...settings, themeHarmony: harmony })
 	}
@@ -259,8 +270,35 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 			themeDepth: DEFAULT_THEME_MODEL.themeDepth,
 			themeContrast: DEFAULT_THEME_MODEL.themeContrast,
 			themeHarmony: DEFAULT_THEME_MODEL.themeHarmony,
+			graphLineThickness: 1.2,
+			showXAxisMarkers: true,
 		})
 	}
+
+	const toggleSection = (section: SidebarSection) => {
+		if (section === activeSection) {
+			return
+		}
+
+		if (sectionTransitionTimer.current !== null) {
+			window.clearTimeout(sectionTransitionTimer.current)
+			sectionTransitionTimer.current = null
+		}
+
+		setActiveSection(null)
+		sectionTransitionTimer.current = window.setTimeout(() => {
+			setActiveSection(section)
+			sectionTransitionTimer.current = null
+		}, CLOSE_BEFORE_OPEN_MS)
+	}
+
+	useEffect(() => {
+		return () => {
+			if (sectionTransitionTimer.current !== null) {
+				window.clearTimeout(sectionTransitionTimer.current)
+			}
+		}
+	}, [])
 
 	return (
 		<div className="card-customizer">
@@ -269,47 +307,25 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 				<p>Tune layout, chart processing, and visual theme.</p>
 			</div>
 
-			<div className="customizer-tabs" role="tablist" aria-label="Customize tabs">
+			<section className="customizer-section-block" aria-labelledby="customizer-general-title">
 				<button
 					type="button"
-					role="tab"
-					aria-selected={activeTab === "general"}
-					className={activeTab === "general" ? "active" : ""}
+					id="customizer-general-title"
+					className={`customizer-section-toggle ${activeSection === "general" ? "active" : ""}`}
 					onClick={() => {
-						setActiveTab("general")
+						toggleSection("general")
 					}}
+					aria-expanded={activeSection === "general"}
 				>
-					General
+					<span>General</span>
+					<small>Configure stats and headline workout metrics.</small>
 				</button>
-				<button
-					type="button"
-					role="tab"
-					aria-selected={activeTab === "chart"}
-					className={activeTab === "chart" ? "active" : ""}
-					onClick={() => {
-						setActiveTab("chart")
-					}}
+				<div
+					className={`customizer-section-panel ${activeSection === "general" ? "is-open" : ""}`}
+					aria-hidden={activeSection !== "general"}
 				>
-					Chart
-				</button>
-				<button
-					type="button"
-					role="tab"
-					aria-selected={activeTab === "theme"}
-					className={activeTab === "theme" ? "active" : ""}
-					onClick={() => {
-						setActiveTab("theme")
-					}}
-				>
-					Theme
-				</button>
-			</div>
-
-			{activeTab === "general" && (
-				<div className="customizer-tab-panel" role="tabpanel">
-					<details className="customizer-accordion" open>
-						<summary className="customizer-accordion-title">Stats</summary>
-						<div className="customizer-accordion-body">
+						<div className="customizer-group">
+							<h5>Stats</h5>
 							<div className="customizer-options">
 								<div className="customizer-segment">
 									<span className="segment-label">Mode</span>
@@ -350,7 +366,7 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 									/>
 									<span className="segment-unit">W</span>
 								</div>
-								{settings.statsDisplayMode === "advanced" && (
+								{settings.statsDisplayMode === "advanced" ? (
 									<label className="customizer-toggle">
 										<input
 											type="checkbox"
@@ -364,18 +380,31 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 										</span>
 										<span className="toggle-label">Show Power Records</span>
 									</label>
-								)}
+								) : null}
 							</div>
 						</div>
-					</details>
-				</div>
-			)}
+					</div>
+			</section>
 
-			{activeTab === "chart" && (
-				<div className="customizer-tab-panel" role="tabpanel">
-					<details className="customizer-accordion" open>
-						<summary className="customizer-accordion-title">Display</summary>
-						<div className="customizer-accordion-body">
+			<section className="customizer-section-block" aria-labelledby="customizer-chart-title">
+				<button
+					type="button"
+					id="customizer-chart-title"
+					className={`customizer-section-toggle ${activeSection === "chart" ? "active" : ""}`}
+					onClick={() => {
+						toggleSection("chart")
+					}}
+					aria-expanded={activeSection === "chart"}
+				>
+					<span>Chart</span>
+					<small>Tune data processing and chart axes for cleaner storytelling.</small>
+				</button>
+				<div
+					className={`customizer-section-panel ${activeSection === "chart" ? "is-open" : ""}`}
+					aria-hidden={activeSection !== "chart"}
+				>
+						<div className="customizer-group">
+							<h5>Display</h5>
 							<div className="customizer-options">
 								{hasHeartRate && (
 									<label className="customizer-toggle">
@@ -409,11 +438,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 								)}
 							</div>
 						</div>
-					</details>
 
-					<details className="customizer-accordion" open>
-						<summary className="customizer-accordion-title">Axis</summary>
-						<div className="customizer-accordion-body">
+						<div className="customizer-group">
+							<h5>Axis</h5>
 							<div className="customizer-options">
 								{hasDistance && (
 									<div className="customizer-segment">
@@ -454,11 +481,39 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 								</div>
 							</div>
 						</div>
-					</details>
 
-					<details className="customizer-accordion">
-						<summary className="customizer-accordion-title">Data Cleanup</summary>
-						<div className="customizer-accordion-body">
+						<div className="customizer-group">
+							<h5>Style</h5>
+							<div className="customizer-group-body">
+								<label className="theme-slider-row">
+									<span>Graph Lines</span>
+									<input
+										type="range"
+										min={0.6}
+										max={3}
+										step={0.1}
+										value={settings.graphLineThickness}
+										onChange={handleGraphLineThicknessChange}
+										className="theme-range"
+									/>
+									<span>{settings.graphLineThickness.toFixed(1)}x</span>
+								</label>
+								<label className="customizer-toggle">
+									<input
+										type="checkbox"
+										checked={settings.showXAxisMarkers}
+										onChange={handleShowXAxisMarkersChange}
+									/>
+									<span className="toggle-track">
+										<span className="toggle-thumb" />
+									</span>
+									<span className="toggle-label">Show X-Axis Markers</span>
+								</label>
+							</div>
+						</div>
+
+						<div className="customizer-group">
+							<h5>Data Cleanup</h5>
 							<div className="customizer-options">
 								<label className="customizer-toggle">
 									<input
@@ -503,55 +558,69 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 								)}
 							</div>
 						</div>
-					</details>
 
-					<details className="customizer-accordion">
-						<summary className="customizer-accordion-title">Trim Workout</summary>
-						<div className="customizer-accordion-body">
-							<DualRangeSlider
-								min={0}
-								max={durationMinutes}
-								step={0.5}
-								valueStart={settings.trimStartMinutes}
-								valueEnd={trimEnd}
-								onChange={handleTrimChange}
-							/>
-							<div className="trim-inputs">
-								<label className="trim-field">
-									<span>Start</span>
-									<input
-										type="number"
-										min={0}
-										max={trimEnd - 0.5}
-										step={0.5}
-										value={settings.trimStartMinutes}
-										onChange={handleTrimStartInput}
-									/>
-									<span className="trim-unit">min</span>
-								</label>
-								<label className="trim-field">
-									<span>End</span>
-									<input
-										type="number"
-										min={settings.trimStartMinutes + 0.5}
-										max={durationMinutes}
-										step={0.5}
-										value={trimEnd}
-										onChange={handleTrimEndInput}
-									/>
-									<span className="trim-unit">min</span>
-								</label>
+						<div className="customizer-group">
+							<h5>Trim Workout</h5>
+							<div className="customizer-group-body">
+								<DualRangeSlider
+									min={0}
+									max={durationMinutes}
+									step={0.5}
+									valueStart={settings.trimStartMinutes}
+									valueEnd={trimEnd}
+									onChange={handleTrimChange}
+								/>
+								<div className="trim-inputs">
+									<label className="trim-field">
+										<span>Start</span>
+										<input
+											type="number"
+											min={0}
+											max={trimEnd - 0.5}
+											step={0.5}
+											value={settings.trimStartMinutes}
+											onChange={handleTrimStartInput}
+										/>
+										<span className="trim-unit">min</span>
+									</label>
+									<label className="trim-field">
+										<span>End</span>
+										<input
+											type="number"
+											min={settings.trimStartMinutes + 0.5}
+											max={durationMinutes}
+											step={0.5}
+											value={trimEnd}
+											onChange={handleTrimEndInput}
+										/>
+										<span className="trim-unit">min</span>
+									</label>
+								</div>
 							</div>
 						</div>
-					</details>
-				</div>
-			)}
+					</div>
+			</section>
 
-			{activeTab === "theme" && (
-				<div className="customizer-tab-panel" role="tabpanel">
-					<details className="customizer-accordion" open>
-						<summary className="customizer-accordion-title">Theme Lab</summary>
-						<div className="customizer-accordion-body">
+			<section className="customizer-section-block" aria-labelledby="customizer-theme-title">
+				<button
+					type="button"
+					id="customizer-theme-title"
+					className={`customizer-section-toggle ${activeSection === "theme" ? "active" : ""}`}
+					onClick={() => {
+						toggleSection("theme")
+					}}
+					aria-expanded={activeSection === "theme"}
+				>
+					<span>Theme Lab</span>
+					<small>Color and contrast are scoped to the workout canvas only.</small>
+				</button>
+				<div
+					className={`customizer-section-panel ${activeSection === "theme" ? "is-open" : ""}`}
+					aria-hidden={activeSection !== "theme"}
+				>
+					<div className="customizer-group">
+						<h5>Palette</h5>
+						<div className="customizer-group-body">
 							<div className="theme-lab">
 								<div className="theme-spectrum-shell">
 									<div className="theme-spectrum-head">
@@ -652,9 +721,9 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 								</div>
 							</div>
 						</div>
-					</details>
+					</div>
 				</div>
-			)}
+			</section>
 		</div>
 	)
 }
