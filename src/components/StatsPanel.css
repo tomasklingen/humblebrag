@@ -10,7 +10,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-end;
-	gap: 1.5rem;
+	gap: 1rem;
 	margin-bottom: 2rem;
 }
 
@@ -46,11 +46,12 @@
 	flex-direction: column;
 	align-items: flex-end;
 	gap: 0;
+	margin-right: 0.35rem;
 }
 
 .date-line {
 	font-family: var(--font-display);
-	font-size: var(--text-caption);
+	font-size: var(--text-body);
 	font-weight: var(--weight-bold);
 	letter-spacing: var(--tracking-wider);
 	color: var(--color-border);
@@ -59,7 +60,7 @@
 }
 
 .date-day {
-	font-size: var(--text-title);
+	font-size: var(--text-hero);
 	font-weight: var(--weight-black);
 	color: var(--color-text);
 	letter-spacing: -0.03em;
@@ -206,6 +207,7 @@
 		flex-direction: row;
 		align-items: baseline;
 		gap: 0.5rem;
+		margin-right: 0;
 	}
 
 	.date-day {
