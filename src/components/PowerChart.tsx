@@ -223,7 +223,11 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							const label = name === "targetPower" ? "Target" : "Power"
 							return [`${Math.round(value ?? 0)}W`, label]
 						}}
-						labelFormatter={(label: number) => (useDistance ? `${label} km` : `${label} min`)}
+						labelFormatter={(label: unknown) => {
+							const labelValue =
+								typeof label === "number" || typeof label === "string" ? label : ""
+							return useDistance ? `${labelValue} km` : `${labelValue} min`
+						}}
 					/>
 					{hasTargetPower && (
 						<Line
