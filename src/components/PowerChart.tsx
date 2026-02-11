@@ -98,6 +98,9 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 
 	const maxHR = hasHeartRate ? Math.max(...powerRecords.map((r) => r.heartRate ?? 0)) : 0
 	const hrAxisMax = Math.ceil((maxHR * 1.1) / 10) * 10
+	const hrLineColor = "var(--color-error)"
+	const hrActiveDotColor = "var(--color-error-light)"
+	const hrAxisColor = hrLineColor
 
 	// Compute custom x-axis ticks when interval is set
 	const xKey = useDistance ? "distance" : "time"
@@ -121,11 +124,11 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 				>
 					<defs>
 						<linearGradient id="powerGradient" x1="0" y1="0" x2="0" y2="1">
-							<stop offset="0%" stopColor="#fbbf24" stopOpacity={0.8} />
-							<stop offset="100%" stopColor="#f97316" stopOpacity={0.1} />
+							<stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.8} />
+							<stop offset="100%" stopColor="var(--color-primary)" stopOpacity={0.1} />
 						</linearGradient>
 					</defs>
-					<CartesianGrid strokeDasharray="3 3" stroke="rgba(30, 41, 59, 0.5)" />
+					<CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
 					<XAxis
 						dataKey={xKey}
 						label={{
@@ -133,16 +136,16 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							position: "insideBottom",
 							offset: -5,
 							style: {
-								fill: "#334155",
+								fill: "var(--color-text-ghost)",
 								fontSize: "0.6rem",
 								fontWeight: 700,
 								fontFamily: "Helvetica Neue, Arial, sans-serif",
 								letterSpacing: "0.15em",
 							},
 						}}
-						stroke="rgba(51, 65, 85, 0.4)"
+						stroke="var(--color-border)"
 						tick={{
-							fill: "#475569",
+							fill: "var(--color-text-secondary)",
 							fontSize: "0.625rem",
 							fontWeight: 600,
 							fontFamily: "Helvetica Neue, Arial, sans-serif",
@@ -160,16 +163,16 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							angle: -90,
 							position: "insideLeft",
 							style: {
-								fill: "#334155",
+								fill: "var(--color-text-ghost)",
 								fontSize: "0.6rem",
 								fontWeight: 700,
 								fontFamily: "Helvetica Neue, Arial, sans-serif",
 								letterSpacing: "0.15em",
 							},
 						}}
-						stroke="rgba(51, 65, 85, 0.4)"
+						stroke="var(--color-border)"
 						tick={{
-							fill: "#475569",
+							fill: "var(--color-text-secondary)",
 							fontSize: "0.625rem",
 							fontWeight: 600,
 							fontFamily: "Helvetica Neue, Arial, sans-serif",
@@ -186,16 +189,16 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 								angle: 90,
 								position: "insideRight",
 								style: {
-									fill: "rgba(239, 68, 68, 0.3)",
+									fill: hrAxisColor,
 									fontSize: "0.6rem",
 									fontWeight: 700,
 									fontFamily: "Helvetica Neue, Arial, sans-serif",
 									letterSpacing: "0.15em",
 								},
 							}}
-							stroke="rgba(51, 65, 85, 0.4)"
+							stroke={hrAxisColor}
 							tick={{
-								fill: "rgba(239, 68, 68, 0.4)",
+								fill: hrAxisColor,
 								fontSize: "0.625rem",
 								fontWeight: 600,
 								fontFamily: "Helvetica Neue, Arial, sans-serif",
@@ -205,10 +208,10 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 					)}
 					<Tooltip
 						contentStyle={{
-							backgroundColor: "#0f172a",
-							border: "1px solid #1e293b",
+							backgroundColor: "var(--color-background)",
+							border: "1px solid var(--color-surface)",
 							borderRadius: "0",
-							color: "#94a3b8",
+							color: "var(--color-text-secondary)",
 							fontFamily: "Helvetica Neue, Arial, sans-serif",
 							fontSize: "0.75rem",
 							fontWeight: 600,
@@ -227,32 +230,32 @@ export function PowerChart({ records, settings }: PowerChartProps) {
 							yAxisId="power"
 							type="monotone"
 							dataKey="targetPower"
-							stroke="#94a3b8"
+							stroke="var(--color-text-muted)"
 							strokeWidth={1.5}
 							strokeDasharray="5 5"
 							dot={false}
-							activeDot={{ r: 4, fill: "#cbd5e1" }}
+							activeDot={{ r: 4, fill: "var(--color-text-secondary)" }}
 						/>
 					)}
 					<Line
 						yAxisId="power"
 						type="monotone"
 						dataKey="power"
-						stroke="#f97316"
+						stroke="var(--color-primary)"
 						strokeWidth={1.2}
 						fill="url(#powerGradient)"
 						dot={false}
-						activeDot={{ r: 4, fill: "#fbbf24" }}
+						activeDot={{ r: 4, fill: "var(--color-accent)" }}
 					/>
 					{hasHeartRate && (
 						<Line
 							yAxisId="hr"
 							type="monotone"
 							dataKey="heartRate"
-							stroke="#ef4444"
+							stroke={hrLineColor}
 							strokeWidth={1.2}
 							dot={false}
-							activeDot={{ r: 4, fill: "#f87171" }}
+							activeDot={{ r: 4, fill: hrActiveDotColor }}
 						/>
 					)}
 				</LineChart>

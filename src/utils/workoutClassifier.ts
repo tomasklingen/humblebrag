@@ -23,10 +23,7 @@ export interface WorkoutClassification {
 /**
  * Analyzes power distribution across training zones.
  */
-function analyzeZoneDistribution(
-	records: WorkoutRecord[],
-	ftp: number,
-): Record<string, number> {
+function analyzeZoneDistribution(records: WorkoutRecord[], ftp: number): Record<string, number> {
 	if (ftp === 0) {
 		return {}
 	}
@@ -78,9 +75,7 @@ function analyzeZoneDistribution(
  * Calculates variability coefficient (how spiky the workout is).
  */
 function calculateVariability(records: WorkoutRecord[]): number {
-	const powers = records
-		.map((r) => r.power)
-		.filter((p): p is number => p !== undefined && p > 0)
+	const powers = records.map((r) => r.power).filter((p): p is number => p !== undefined && p > 0)
 
 	if (powers.length === 0) return 0
 
@@ -149,7 +144,8 @@ export function classifyWorkout(
 	if (zones.tempo > 40 && variability < 0.35) {
 		return {
 			type: "Sweetspot",
-			description: "Right in the productive pain cave. Hard enough to adapt, not hard enough to break.",
+			description:
+				"Right in the productive pain cave. Hard enough to adapt, not hard enough to break.",
 			emoji: "🎯",
 			zoneDistribution: zones,
 		}

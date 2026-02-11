@@ -1,3 +1,5 @@
+export type ThemeHarmony = "analogous" | "split" | "complementary" | "triadic"
+
 export interface WorkoutData {
 	sport: string
 	subSport: string
@@ -30,11 +32,17 @@ export interface CardSettings {
 	smoothData: boolean
 	removeZeroPower: boolean
 	removeZeroHeartRate: boolean
+	themeHue: number
+	themeVibrance: number
+	themeDepth: number
+	themeContrast: number
+	themeHarmony: ThemeHarmony
 	xAxisMode: "time" | "distance"
 	xAxisInterval: number | null // null = auto, otherwise minutes or km depending on xAxisMode
 	trimStartMinutes: number
 	trimEndMinutes: number | null // null = full workout (no trim)
 	statsDisplayMode: "basic" | "advanced" // basic = simple stats, advanced = pro metrics
+	showPowerRecords: boolean // Show best-effort power record stats in advanced mode
 	functionalThresholdPower: number // User's FTP in watts (0 = not set)
 }
 

@@ -42,7 +42,7 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 			<svg width="0" height="0" style={{ position: "absolute" }}>
 				<defs>
 					<filter id="emoji-solid-orange">
-						<feFlood floodColor="#f97316" result="flood" />
+						<feFlood style={{ floodColor: "var(--color-primary)" }} result="flood" />
 						<feComposite in="flood" in2="SourceGraphic" operator="in" />
 					</filter>
 				</defs>
@@ -90,18 +90,22 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 
 			{isAdvancedMode ? (
 				<div className="stats-grid">
-					<div className="stat-item">
-						<div className="stat-label">1min Power</div>
-						<div className="stat-value">{powerMetrics.bestPower1min}W</div>
-					</div>
-					<div className="stat-item">
-						<div className="stat-label">5min Power</div>
-						<div className="stat-value">{powerMetrics.bestPower5min}W</div>
-					</div>
-					<div className="stat-item">
-						<div className="stat-label">20min Power</div>
-						<div className="stat-value">{powerMetrics.bestPower20min}W</div>
-					</div>
+					{settings.showPowerRecords && (
+						<>
+							<div className="stat-item">
+								<div className="stat-label">1min Power</div>
+								<div className="stat-value">{powerMetrics.bestPower1min}W</div>
+							</div>
+							<div className="stat-item">
+								<div className="stat-label">5min Power</div>
+								<div className="stat-value">{powerMetrics.bestPower5min}W</div>
+							</div>
+							<div className="stat-item">
+								<div className="stat-label">20min Power</div>
+								<div className="stat-value">{powerMetrics.bestPower20min}W</div>
+							</div>
+						</>
+					)}
 					<div className="stat-item">
 						<div className="stat-label">VI</div>
 						<div className="stat-value">{powerMetrics.variabilityIndex}</div>
@@ -122,7 +126,7 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 							</div>
 						</>
 					)}
-					{settings.showHeartRate && data.avgHeartRate > 0 && (
+					{data.avgHeartRate > 0 && (
 						<div className="stat-item">
 							<div className="stat-label">Avg HR</div>
 							<div className="stat-value">{Math.round(data.avgHeartRate)} bpm</div>
@@ -143,7 +147,7 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 						<div className="stat-label">Calories</div>
 						<div className="stat-value">{Math.round(data.calories)}</div>
 					</div>
-					{settings.showHeartRate && data.avgHeartRate > 0 && (
+					{data.avgHeartRate > 0 && (
 						<>
 							<div className="stat-item">
 								<div className="stat-label">Avg HR</div>

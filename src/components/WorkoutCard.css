@@ -21,11 +21,22 @@
 }
 
 .workout-card-footer {
+	position: relative;
 	padding: 1.25rem 2.5rem;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	gap: 0.75rem;
+}
+
+.workout-card-footer::before {
+	content: "";
+	position: absolute;
+	left: 2.5rem;
+	right: 2.5rem;
+	top: 0;
+	height: 1px;
+	background: var(--color-surface);
 }
 
 .footer-text {
@@ -37,16 +48,6 @@
 	text-transform: uppercase;
 }
 
-.footer-text-muted {
-	color: var(--color-text-invisible);
-}
-
-.footer-dot {
-	width: 3px;
-	height: 3px;
-	background: var(--color-text-invisible);
-}
-
 @media (max-width: 768px) {
 	.workout-card {
 		margin: 1rem;
@@ -54,6 +55,15 @@
 
 	.workout-card-header {
 		padding: 1rem 1.5rem;
+	}
+
+	.workout-card-footer {
+		padding: 1rem 1.5rem;
+	}
+
+	.workout-card-footer::before {
+		left: 1.5rem;
+		right: 1.5rem;
 	}
 
 	.header-brand {

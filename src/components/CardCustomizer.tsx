@@ -1,5 +1,7 @@
+import { useCallback, useMemo, useRef, useState } from "react"
+import type { CardSettings, ThemeHarmony, WorkoutData } from "../types/workout"
+import { DEFAULT_THEME_MODEL, createThemePalette, getHarmonyShift } from "../utils/themePalette"
 import { DualRangeSlider } from "./DualRangeSlider"
-import type { CardSettings, WorkoutData } from "../types/workout"
 import "./CardCustomizer.css"
 
 interface CardCustomizerProps {
@@ -26,15 +28,139 @@ const DISTANCE_INTERVALS = [
 	{ label: "20 km", value: 20 },
 ] as const
 
+const HARMONY_OPTIONS = [
+	{ value: "analogous", label: "Analogous", detail: "tight family" },
+	{ value: "split", label: "Split", detail: "balanced contrast" },
+	{ value: "complementary", label: "Complement", detail: "high pop" },
+	{ value: "triadic", label: "Triadic", detail: "creative spread" },
+] as const satisfies ReadonlyArray<{ value: ThemeHarmony; label: string; detail: string }>
+
+type ComposerNodeId = "background" | "surface" | "primary" | "accent"
+type CustomizerTab = "general" | "chart" | "theme"
+
+interface ComposerNode {
+	id: ComposerNodeId
+	label: string
+	hue: number
+	color: string
+	orbit: number
+	x: number
+	y: number
+}
+
+const toOrbitPosition = (hue: number, orbit: number): Pick<ComposerNode, "x" | "y"> => {
+	const wrapped = ((hue % 360) + 360) % 360
+	const angle = ((wrapped - 90) * Math.PI) / 180
+
+	return {
+		x: 50 + Math.cos(angle) * orbit,
+		y: 50 + Math.sin(angle) * orbit,
+	}
+}
+
+const clamp = (value: number, min: number, max: number): number =>
+	Math.min(Math.max(value, min), max)
+
 export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps) {
+	const [activeTab, setActiveTab] = useState<CustomizerTab>("general")
+	const activeFieldPointerId = useRef<number | null>(null)
+
 	const hasHeartRate = data.avgHeartRate > 0
 	const hasTargetPower = data.records.some((r) => r.targetPower !== undefined && r.targetPower > 0)
 	const hasDistance = data.records.some((r) => r.distance !== undefined && r.distance > 0)
 
 	const durationMinutes = Math.ceil(data.duration / 60)
 	const trimEnd = settings.trimEndMinutes ?? durationMinutes
-
 	const intervals = settings.xAxisMode === "distance" ? DISTANCE_INTERVALS : TIME_INTERVALS
+
+	const themePalette = useMemo(
+		() =>
+			createThemePalette({
+				themeHue: settings.themeHue,
+				themeVibrance: settings.themeVibrance,
+				themeDepth: settings.themeDepth,
+				themeContrast: settings.themeContrast,
+				themeHarmony: settings.themeHarmony,
+			}),
+		[
+			settings.themeHue,
+			settings.themeVibrance,
+			settings.themeDepth,
+			settings.themeContrast,
+			settings.themeHarmony,
+		],
+	)
+
+	const harmonyShift = getHarmonyShift(settings.themeHarmony)
+
+	const composerNodes = useMemo(() => {
+		const baseNodes: Array<Omit<ComposerNode, "x" | "y">> = [
+			{
+				id: "background",
+				label: "Background",
+				hue: themePalette.backgroundHue,
+				color: themePalette.background,
+				orbit: 13,
+			},
+			{
+				id: "surface",
+				label: "Surface",
+				hue: themePalette.surfaceHue,
+				color: themePalette.surface,
+				orbit: 24,
+			},
+			{
+				id: "primary",
+				label: "Primary",
+				hue: themePalette.primaryHue,
+				color: themePalette.primary,
+				orbit: 34,
+			},
+			{
+				id: "accent",
+				label: "Accent",
+				hue: themePalette.accentHue,
+				color: themePalette.accent,
+				orbit: 43,
+			},
+		]
+
+		return baseNodes.map((node) => {
+			const position = toOrbitPosition(node.hue, node.orbit)
+			return {
+				id: node.id,
+				label: node.label,
+				hue: node.hue,
+				color: node.color,
+				orbit: node.orbit,
+				x: position.x,
+				y: position.y,
+			}
+		})
+	}, [
+		themePalette.backgroundHue,
+		themePalette.background,
+		themePalette.surfaceHue,
+		themePalette.surface,
+		themePalette.primaryHue,
+		themePalette.primary,
+		themePalette.accentHue,
+		themePalette.accent,
+	])
+
+	const composerLinks = useMemo(
+		() => [
+			{ id: "bg-surface", from: composerNodes[0], to: composerNodes[1] },
+			{ id: "surface-primary", from: composerNodes[1], to: composerNodes[2] },
+			{ id: "primary-accent", from: composerNodes[2], to: composerNodes[3] },
+		],
+		[composerNodes],
+	)
+
+	const fieldCursor = useMemo(
+		() => toOrbitPosition(settings.themeHue, 8 + (settings.themeVibrance / 100) * 42),
+		[settings.themeHue, settings.themeVibrance],
+	)
 
 	const handleXAxisModeChange = (mode: "time" | "distance") => {
 		onChange({ ...settings, xAxisMode: mode, xAxisInterval: null })
@@ -70,215 +196,465 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 		}
 	}
 
+	const applyFieldPointer = useCallback(
+		(event: React.PointerEvent<HTMLDivElement>) => {
+			const bounds = event.currentTarget.getBoundingClientRect()
+			const centerX = bounds.left + bounds.width / 2
+			const centerY = bounds.top + bounds.height / 2
+			const deltaX = event.clientX - centerX
+			const deltaY = event.clientY - centerY
+			const maxRadius = Math.min(bounds.width, bounds.height) / 2
+			const radialDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+
+			const hue = ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 90 + 360) % 360
+			const vibrance = Math.round((clamp(radialDistance, 0, maxRadius) / maxRadius) * 100)
+
+			onChange({
+				...settings,
+				themeHue: Math.round(hue),
+				themeVibrance: vibrance,
+			})
+		},
+		[onChange, settings],
+	)
+
+	const handleFieldPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+		activeFieldPointerId.current = event.pointerId
+		event.currentTarget.setPointerCapture(event.pointerId)
+		applyFieldPointer(event)
+	}
+
+	const handleFieldPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+		if (activeFieldPointerId.current !== event.pointerId) {
+			return
+		}
+		applyFieldPointer(event)
+	}
+
+	const handleFieldPointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
+		if (activeFieldPointerId.current !== event.pointerId) {
+			return
+		}
+		activeFieldPointerId.current = null
+		event.currentTarget.releasePointerCapture(event.pointerId)
+	}
+
+	const handleThemeDepthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		onChange({ ...settings, themeDepth: Number(e.target.value) })
+	}
+
+	const handleThemeContrastChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		onChange({ ...settings, themeContrast: Number(e.target.value) })
+	}
+
+	const handleThemeHarmonyChange = (harmony: ThemeHarmony) => {
+		onChange({ ...settings, themeHarmony: harmony })
+	}
+
+	const handleThemeReset = () => {
+		onChange({
+			...settings,
+			themeHue: DEFAULT_THEME_MODEL.themeHue,
+			themeVibrance: DEFAULT_THEME_MODEL.themeVibrance,
+			themeDepth: DEFAULT_THEME_MODEL.themeDepth,
+			themeContrast: DEFAULT_THEME_MODEL.themeContrast,
+			themeHarmony: DEFAULT_THEME_MODEL.themeHarmony,
+		})
+	}
+
 	return (
 		<div className="card-customizer">
-			<h3>Customize Card</h3>
-
-			<div className="customizer-section">
-				<h4>Stats Display</h4>
-				<div className="customizer-options">
-					<div className="customizer-segment">
-						<span className="segment-label">Mode</span>
-						<div className="segment-buttons">
-							<button
-								className={settings.statsDisplayMode === "basic" ? "active" : ""}
-								onClick={() => {
-									onChange({ ...settings, statsDisplayMode: "basic" })
-								}}
-							>
-								Basic
-							</button>
-							<button
-								className={settings.statsDisplayMode === "advanced" ? "active" : ""}
-								onClick={() => {
-									onChange({ ...settings, statsDisplayMode: "advanced" })
-								}}
-							>
-								Advanced
-							</button>
-						</div>
-					</div>
-					<div className="customizer-segment">
-						<span className="segment-label">FTP</span>
-						<input
-							type="number"
-							min={0}
-							step={1}
-							placeholder="0"
-							value={settings.functionalThresholdPower || ""}
-							onChange={(e) => {
-								onChange({ ...settings, functionalThresholdPower: Number(e.target.value) || 0 })
-							}}
-							className="customizer-input"
-						/>
-						<span className="segment-unit">W</span>
-					</div>
-				</div>
+			<div className="card-customizer-header">
+				<h3>Customize</h3>
+				<p>Tune layout, chart processing, and visual theme.</p>
 			</div>
 
-			<div className="customizer-section">
-				<h4>Chart Display</h4>
-				<div className="customizer-options">
-					{hasHeartRate && (
-						<label className="customizer-toggle">
-							<input
-								type="checkbox"
-								checked={settings.showHeartRate}
-								onChange={(e) => {
-									onChange({ ...settings, showHeartRate: e.target.checked })
-								}}
-							/>
-							<span className="toggle-track">
-								<span className="toggle-thumb" />
-							</span>
-							<span className="toggle-label">Heart Rate</span>
-						</label>
-					)}
-					{hasTargetPower && (
-						<label className="customizer-toggle">
-							<input
-								type="checkbox"
-								checked={settings.showTargetPower}
-								onChange={(e) => {
-									onChange({ ...settings, showTargetPower: e.target.checked })
-								}}
-							/>
-							<span className="toggle-track">
-								<span className="toggle-thumb" />
-							</span>
-							<span className="toggle-label">Target Power</span>
-						</label>
-					)}
-				</div>
+			<div className="customizer-tabs" role="tablist" aria-label="Customize tabs">
+				<button
+					type="button"
+					role="tab"
+					aria-selected={activeTab === "general"}
+					className={activeTab === "general" ? "active" : ""}
+					onClick={() => {
+						setActiveTab("general")
+					}}
+				>
+					General
+				</button>
+				<button
+					type="button"
+					role="tab"
+					aria-selected={activeTab === "chart"}
+					className={activeTab === "chart" ? "active" : ""}
+					onClick={() => {
+						setActiveTab("chart")
+					}}
+				>
+					Chart
+				</button>
+				<button
+					type="button"
+					role="tab"
+					aria-selected={activeTab === "theme"}
+					className={activeTab === "theme" ? "active" : ""}
+					onClick={() => {
+						setActiveTab("theme")
+					}}
+				>
+					Theme
+				</button>
 			</div>
 
-			<div className="customizer-section">
-				<h4>Data Cleanup</h4>
-				<div className="customizer-options">
-					<label className="customizer-toggle">
-						<input
-							type="checkbox"
-							checked={settings.smoothData}
-							onChange={(e) => {
-								onChange({ ...settings, smoothData: e.target.checked })
-							}}
-						/>
-						<span className="toggle-track">
-							<span className="toggle-thumb" />
-						</span>
-						<span className="toggle-label">Smooth Data</span>
-					</label>
-					<label className="customizer-toggle">
-						<input
-							type="checkbox"
-							checked={settings.removeZeroPower}
-							onChange={(e) => {
-								onChange({ ...settings, removeZeroPower: e.target.checked })
-							}}
-						/>
-						<span className="toggle-track">
-							<span className="toggle-thumb" />
-						</span>
-						<span className="toggle-label">Remove Zero Power</span>
-					</label>
-					{hasHeartRate && (
-						<label className="customizer-toggle">
-							<input
-								type="checkbox"
-								checked={settings.removeZeroHeartRate}
-								onChange={(e) => {
-									onChange({ ...settings, removeZeroHeartRate: e.target.checked })
-								}}
-							/>
-							<span className="toggle-track">
-								<span className="toggle-thumb" />
-							</span>
-							<span className="toggle-label">Remove Zero Heart Rate</span>
-						</label>
-					)}
-				</div>
-			</div>
-
-			<div className="customizer-section">
-				<h4>Chart Axis</h4>
-				<div className="customizer-options">
-					{hasDistance && (
-						<div className="customizer-segment">
-							<span className="segment-label">X-Axis</span>
-							<div className="segment-buttons">
-								<button
-									className={settings.xAxisMode === "time" ? "active" : ""}
-									onClick={() => {
-										handleXAxisModeChange("time")
-									}}
-								>
-									Time
-								</button>
-								<button
-									className={settings.xAxisMode === "distance" ? "active" : ""}
-									onClick={() => {
-										handleXAxisModeChange("distance")
-									}}
-								>
-									Distance
-								</button>
+			{activeTab === "general" && (
+				<div className="customizer-tab-panel" role="tabpanel">
+					<details className="customizer-accordion" open>
+						<summary className="customizer-accordion-title">Stats</summary>
+						<div className="customizer-accordion-body">
+							<div className="customizer-options">
+								<div className="customizer-segment">
+									<span className="segment-label">Mode</span>
+									<div className="segment-buttons">
+										<button
+											className={settings.statsDisplayMode === "basic" ? "active" : ""}
+											onClick={() => {
+												onChange({ ...settings, statsDisplayMode: "basic" })
+											}}
+										>
+											Basic
+										</button>
+										<button
+											className={settings.statsDisplayMode === "advanced" ? "active" : ""}
+											onClick={() => {
+												onChange({ ...settings, statsDisplayMode: "advanced" })
+											}}
+										>
+											Advanced
+										</button>
+									</div>
+								</div>
+								<div className="customizer-segment">
+									<span className="segment-label">FTP</span>
+									<input
+										type="number"
+										min={0}
+										step={1}
+										placeholder="0"
+										value={settings.functionalThresholdPower || ""}
+										onChange={(e) => {
+											onChange({
+												...settings,
+												functionalThresholdPower: Number(e.target.value) || 0,
+											})
+										}}
+										className="customizer-input"
+									/>
+									<span className="segment-unit">W</span>
+								</div>
+								{settings.statsDisplayMode === "advanced" && (
+									<label className="customizer-toggle">
+										<input
+											type="checkbox"
+											checked={settings.showPowerRecords}
+											onChange={(e) => {
+												onChange({ ...settings, showPowerRecords: e.target.checked })
+											}}
+										/>
+										<span className="toggle-track">
+											<span className="toggle-thumb" />
+										</span>
+										<span className="toggle-label">Show Power Records</span>
+									</label>
+								)}
 							</div>
 						</div>
-					)}
-					<div className="customizer-segment">
-						<span className="segment-label">Interval</span>
-						<select
-							className="customizer-select"
-							value={settings.xAxisInterval ?? ""}
-							onChange={handleIntervalChange}
-						>
-							{intervals.map((opt) => (
-								<option key={opt.label} value={opt.value ?? ""}>
-									{opt.label}
-								</option>
-							))}
-						</select>
-					</div>
+					</details>
 				</div>
-			</div>
+			)}
 
-			<div className="customizer-section">
-				<h4>Trim Workout</h4>
-				<DualRangeSlider
-					min={0}
-					max={durationMinutes}
-					step={0.5}
-					valueStart={settings.trimStartMinutes}
-					valueEnd={trimEnd}
-					onChange={handleTrimChange}
-				/>
-				<div className="trim-inputs">
-					<label className="trim-field">
-						<span>Start</span>
-						<input
-							type="number"
-							min={0}
-							max={trimEnd - 0.5}
-							step={0.5}
-							value={settings.trimStartMinutes}
-							onChange={handleTrimStartInput}
-						/>
-						<span className="trim-unit">min</span>
-					</label>
-					<label className="trim-field">
-						<span>End</span>
-						<input
-							type="number"
-							min={settings.trimStartMinutes + 0.5}
-							max={durationMinutes}
-							step={0.5}
-							value={trimEnd}
-							onChange={handleTrimEndInput}
-						/>
-						<span className="trim-unit">min</span>
-					</label>
+			{activeTab === "chart" && (
+				<div className="customizer-tab-panel" role="tabpanel">
+					<details className="customizer-accordion" open>
+						<summary className="customizer-accordion-title">Display</summary>
+						<div className="customizer-accordion-body">
+							<div className="customizer-options">
+								{hasHeartRate && (
+									<label className="customizer-toggle">
+										<input
+											type="checkbox"
+											checked={settings.showHeartRate}
+											onChange={(e) => {
+												onChange({ ...settings, showHeartRate: e.target.checked })
+											}}
+										/>
+										<span className="toggle-track">
+											<span className="toggle-thumb" />
+										</span>
+										<span className="toggle-label">Heart Rate Line</span>
+									</label>
+								)}
+								{hasTargetPower && (
+									<label className="customizer-toggle">
+										<input
+											type="checkbox"
+											checked={settings.showTargetPower}
+											onChange={(e) => {
+												onChange({ ...settings, showTargetPower: e.target.checked })
+											}}
+										/>
+										<span className="toggle-track">
+											<span className="toggle-thumb" />
+										</span>
+										<span className="toggle-label">Target Power</span>
+									</label>
+								)}
+							</div>
+						</div>
+					</details>
+
+					<details className="customizer-accordion" open>
+						<summary className="customizer-accordion-title">Axis</summary>
+						<div className="customizer-accordion-body">
+							<div className="customizer-options">
+								{hasDistance && (
+									<div className="customizer-segment">
+										<span className="segment-label">X-Axis</span>
+										<div className="segment-buttons">
+											<button
+												className={settings.xAxisMode === "time" ? "active" : ""}
+												onClick={() => {
+													handleXAxisModeChange("time")
+												}}
+											>
+												Time
+											</button>
+											<button
+												className={settings.xAxisMode === "distance" ? "active" : ""}
+												onClick={() => {
+													handleXAxisModeChange("distance")
+												}}
+											>
+												Distance
+											</button>
+										</div>
+									</div>
+								)}
+								<div className="customizer-segment">
+									<span className="segment-label">Interval</span>
+									<select
+										className="customizer-select"
+										value={settings.xAxisInterval ?? ""}
+										onChange={handleIntervalChange}
+									>
+										{intervals.map((opt) => (
+											<option key={opt.label} value={opt.value ?? ""}>
+												{opt.label}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+						</div>
+					</details>
+
+					<details className="customizer-accordion">
+						<summary className="customizer-accordion-title">Data Cleanup</summary>
+						<div className="customizer-accordion-body">
+							<div className="customizer-options">
+								<label className="customizer-toggle">
+									<input
+										type="checkbox"
+										checked={settings.smoothData}
+										onChange={(e) => {
+											onChange({ ...settings, smoothData: e.target.checked })
+										}}
+									/>
+									<span className="toggle-track">
+										<span className="toggle-thumb" />
+									</span>
+									<span className="toggle-label">Smooth Data</span>
+								</label>
+								<label className="customizer-toggle">
+									<input
+										type="checkbox"
+										checked={settings.removeZeroPower}
+										onChange={(e) => {
+											onChange({ ...settings, removeZeroPower: e.target.checked })
+										}}
+									/>
+									<span className="toggle-track">
+										<span className="toggle-thumb" />
+									</span>
+									<span className="toggle-label">Remove Zero Power</span>
+								</label>
+								{hasHeartRate && (
+									<label className="customizer-toggle">
+										<input
+											type="checkbox"
+											checked={settings.removeZeroHeartRate}
+											onChange={(e) => {
+												onChange({ ...settings, removeZeroHeartRate: e.target.checked })
+											}}
+										/>
+										<span className="toggle-track">
+											<span className="toggle-thumb" />
+										</span>
+										<span className="toggle-label">Remove Zero Heart Rate</span>
+									</label>
+								)}
+							</div>
+						</div>
+					</details>
+
+					<details className="customizer-accordion">
+						<summary className="customizer-accordion-title">Trim Workout</summary>
+						<div className="customizer-accordion-body">
+							<DualRangeSlider
+								min={0}
+								max={durationMinutes}
+								step={0.5}
+								valueStart={settings.trimStartMinutes}
+								valueEnd={trimEnd}
+								onChange={handleTrimChange}
+							/>
+							<div className="trim-inputs">
+								<label className="trim-field">
+									<span>Start</span>
+									<input
+										type="number"
+										min={0}
+										max={trimEnd - 0.5}
+										step={0.5}
+										value={settings.trimStartMinutes}
+										onChange={handleTrimStartInput}
+									/>
+									<span className="trim-unit">min</span>
+								</label>
+								<label className="trim-field">
+									<span>End</span>
+									<input
+										type="number"
+										min={settings.trimStartMinutes + 0.5}
+										max={durationMinutes}
+										step={0.5}
+										value={trimEnd}
+										onChange={handleTrimEndInput}
+									/>
+									<span className="trim-unit">min</span>
+								</label>
+							</div>
+						</div>
+					</details>
 				</div>
-			</div>
+			)}
+
+			{activeTab === "theme" && (
+				<div className="customizer-tab-panel" role="tabpanel">
+					<details className="customizer-accordion" open>
+						<summary className="customizer-accordion-title">Theme Lab</summary>
+						<div className="customizer-accordion-body">
+							<div className="theme-lab">
+								<div className="theme-spectrum-shell">
+									<div className="theme-spectrum-head">
+										<span>Harmony Field</span>
+										<span>
+											{Math.round(settings.themeHue)}deg / V{settings.themeVibrance}
+										</span>
+									</div>
+									<div
+										className="theme-harmony-field"
+										onPointerDown={handleFieldPointerDown}
+										onPointerMove={handleFieldPointerMove}
+										onPointerUp={handleFieldPointerEnd}
+										onPointerCancel={handleFieldPointerEnd}
+									>
+										<svg viewBox="0 0 100 100" className="theme-harmony-links" aria-hidden="true">
+											{composerLinks.map((link) => (
+												<line
+													key={link.id}
+													x1={link.from.x}
+													y1={link.from.y}
+													x2={link.to.x}
+													y2={link.to.y}
+												/>
+											))}
+										</svg>
+										<div
+											className="harmony-cursor"
+											style={{ left: `${fieldCursor.x}%`, top: `${fieldCursor.y}%` }}
+										/>
+										{composerNodes.map((node) => (
+											<div
+												key={node.id}
+												className="harmony-node"
+												style={{ left: `${node.x}%`, top: `${node.y}%` }}
+											>
+												<i className="harmony-node-dot" style={{ backgroundColor: node.color }} />
+												<span>{node.label}</span>
+											</div>
+										))}
+									</div>
+									<p className="theme-harmony-note">
+										Drag in the field to set hue and vibrance. Accent sits {harmonyShift}deg from
+										primary with {settings.themeHarmony} harmony. Use Background to control how dark
+										the base gets.
+									</p>
+								</div>
+
+								<div className="theme-controls">
+									<div className="harmony-grid">
+										{HARMONY_OPTIONS.map((option) => (
+											<button
+												key={option.value}
+												type="button"
+												className={settings.themeHarmony === option.value ? "active" : ""}
+												onClick={() => {
+													handleThemeHarmonyChange(option.value)
+												}}
+											>
+												<span>{option.label}</span>
+												<small>{option.detail}</small>
+											</button>
+										))}
+									</div>
+
+									<div className="theme-slider-grid">
+										<label className="theme-slider-row">
+											<span>Background</span>
+											<input
+												type="range"
+												min={0}
+												max={100}
+												step={1}
+												value={settings.themeDepth}
+												onChange={handleThemeDepthChange}
+												className="theme-range"
+											/>
+											<span>{settings.themeDepth}</span>
+										</label>
+										<label className="theme-slider-row">
+											<span>Contrast</span>
+											<input
+												type="range"
+												min={0}
+												max={100}
+												step={1}
+												value={settings.themeContrast}
+												onChange={handleThemeContrastChange}
+												className="theme-range"
+											/>
+											<span>{settings.themeContrast}</span>
+										</label>
+									</div>
+
+									<button type="button" className="theme-reset-button" onClick={handleThemeReset}>
+										Back to default
+									</button>
+								</div>
+							</div>
+						</div>
+					</details>
+				</div>
+			)}
 		</div>
 	)
 }

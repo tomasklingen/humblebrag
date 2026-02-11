@@ -22,8 +22,6 @@ export const WorkoutCard = forwardRef<HTMLDivElement, WorkoutCardProps>(
 
 				<div className="workout-card-footer">
 					<span className="footer-text">HUMBLEBRAG</span>
-					<span className="footer-dot" />
-					<span className="footer-text footer-text-muted">EST. 2026</span>
 				</div>
 			</div>
 		)

@@ -5,15 +5,107 @@
 	background: var(--color-surface);
 	border-radius: var(--radius-lg);
 	border: 1px solid var(--color-border);
+	color: var(--color-text);
 }
 
 .card-customizer h3 {
 	margin: 0 0 1rem 0;
 	font-size: 0.875rem;
 	font-weight: var(--weight-semibold);
-	color: var(--color-text-secondary);
+	color: color-mix(in oklch, var(--color-text) 86%, var(--color-background));
 	text-transform: uppercase;
 	letter-spacing: var(--tracking-normal);
+}
+
+.card-customizer-header {
+	margin-bottom: 0.9rem;
+}
+
+.card-customizer-header p {
+	margin: -0.35rem 0 0;
+	font-size: 0.8rem;
+	color: var(--color-text-secondary);
+}
+
+.customizer-tabs {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 0.4rem;
+	padding: 0.35rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: color-mix(in oklch, var(--color-surface-hover) 55%, transparent);
+	margin-bottom: 0.9rem;
+}
+
+.customizer-tabs button {
+	padding: 0.45rem 0.6rem;
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+	background: transparent;
+	color: var(--color-text-muted);
+	font-size: var(--text-body);
+	font-weight: var(--weight-semibold);
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	cursor: pointer;
+	transition: all var(--transition-fast);
+}
+
+.customizer-tabs button.active {
+	background: color-mix(in oklch, var(--color-primary) 26%, var(--color-surface));
+	border-color: color-mix(in oklch, var(--color-primary) 50%, var(--color-border));
+	color: var(--color-text);
+}
+
+.customizer-tab-panel {
+	display: grid;
+	gap: 0.65rem;
+}
+
+.customizer-accordion {
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: color-mix(in oklch, var(--color-surface-hover) 35%, transparent);
+	overflow: hidden;
+}
+
+.customizer-accordion-title {
+	list-style: none;
+	cursor: pointer;
+	padding: 0.65rem 0.8rem;
+	font-size: var(--text-body);
+	font-weight: var(--weight-semibold);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: color-mix(in oklch, var(--color-text) 86%, var(--color-background));
+	user-select: none;
+	position: relative;
+	padding-right: 2.2rem;
+}
+
+.customizer-accordion-title::-webkit-details-marker {
+	display: none;
+}
+
+.customizer-accordion-title::after {
+	content: "+";
+	position: absolute;
+	right: 0.85rem;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 0.95rem;
+	font-weight: var(--weight-bold);
+	color: var(--color-text-secondary);
+}
+
+.customizer-accordion[open] > .customizer-accordion-title::after {
+	content: "-";
+}
+
+.customizer-accordion-body {
+	padding: 0.15rem 0.8rem 0.85rem;
+	border-top: 1px solid color-mix(in oklch, var(--color-border) 80%, transparent);
 }
 
 .customizer-options {
@@ -97,7 +189,7 @@
 	padding: 0.375rem 0.75rem;
 	font-size: var(--text-body);
 	font-weight: var(--weight-medium);
-	color: var(--color-text-secondary);
+	color: var(--color-text-muted);
 	background: transparent;
 	border: none;
 	border-radius: var(--radius-sm);
@@ -171,9 +263,312 @@
 	margin: 0 0 0.75rem 0;
 	font-size: var(--text-body);
 	font-weight: var(--weight-semibold);
-	color: var(--color-text-secondary);
+	color: color-mix(in oklch, var(--color-text) 82%, var(--color-background));
 	text-transform: uppercase;
 	letter-spacing: var(--tracking-normal);
+}
+
+.theme-lab {
+	display: grid;
+	gap: 1rem;
+}
+
+.theme-spectrum-shell {
+	padding: 1rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background:
+		radial-gradient(
+			circle at 15% -40%,
+			color-mix(in oklch, var(--color-primary) 35%, transparent),
+			transparent 55%
+		),
+		radial-gradient(
+			circle at 85% 140%,
+			color-mix(in oklch, var(--color-accent) 30%, transparent),
+			transparent 60%
+		),
+		linear-gradient(
+			160deg,
+			color-mix(in oklch, var(--color-surface) 92%, #000),
+			var(--color-surface)
+		);
+}
+
+.theme-spectrum-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-family: var(--font-display);
+	font-size: var(--text-caption);
+	font-weight: var(--weight-bold);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wide);
+	color: color-mix(in oklch, var(--color-text) 88%, var(--color-background));
+	margin-bottom: 0.75rem;
+}
+
+.theme-harmony-field {
+	position: relative;
+	aspect-ratio: 1;
+	width: min(100%, 16.5rem);
+	margin: 0 auto;
+	border-radius: 50%;
+	border: none;
+	background:
+		radial-gradient(
+			circle at center,
+			transparent 0 51.3%,
+			color-mix(in oklch, var(--color-text) 17%, transparent) 51.6% 52.2%,
+			transparent 52.5% 100%
+		),
+		radial-gradient(
+			circle at center,
+			transparent 0 75.3%,
+			color-mix(in oklch, var(--color-text) 17%, transparent) 75.6% 76.2%,
+			transparent 76.5% 100%
+		),
+		radial-gradient(
+			circle at center,
+			color-mix(in oklch, var(--color-background) 70%, transparent) 0%,
+			transparent 30%
+		),
+		radial-gradient(
+			circle at center,
+			color-mix(in oklch, var(--color-background) 82%, transparent) 0%,
+			transparent 64%
+		),
+		conic-gradient(
+			from 0deg,
+			#ff3e3e,
+			#ff8a00,
+			#ffd500,
+			#2bd67b,
+			#29a4ff,
+			#7b5cff,
+			#ff3e8e,
+			#ff3e3e
+		);
+	box-shadow:
+		inset 0 0 0 1px color-mix(in oklch, var(--color-text) 22%, transparent),
+		inset 0 0 1.8rem color-mix(in oklch, var(--color-background) 70%, transparent),
+		0 0.4rem 1rem color-mix(in oklch, var(--color-background) 70%, transparent);
+	overflow: hidden;
+	-webkit-mask-image: radial-gradient(circle at center, #000 98.8%, transparent 100%);
+	mask-image: radial-gradient(circle at center, #000 98.8%, transparent 100%);
+	touch-action: none;
+	cursor: crosshair;
+}
+
+.theme-harmony-links {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+}
+
+.theme-harmony-links line {
+	stroke: color-mix(in oklch, var(--color-text) 35%, transparent);
+	stroke-width: 0.65;
+	stroke-linecap: round;
+}
+
+.harmony-cursor {
+	position: absolute;
+	width: 1.15rem;
+	height: 1.15rem;
+	transform: translate(-50%, -50%);
+	border-radius: 50%;
+	border: 2px solid color-mix(in oklch, var(--color-text) 85%, transparent);
+	box-shadow:
+		0 0 0 2px color-mix(in oklch, var(--color-background) 76%, transparent),
+		0 0.3rem 0.9rem color-mix(in oklch, var(--color-background) 68%, transparent);
+	pointer-events: none;
+}
+
+.harmony-node {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+	pointer-events: none;
+	max-width: 6rem;
+}
+
+.harmony-node-dot {
+	width: 0.84rem;
+	height: 0.84rem;
+	border-radius: 50%;
+	border: 2px solid color-mix(in oklch, var(--color-text) 68%, transparent);
+	box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-background) 70%, transparent);
+	flex-shrink: 0;
+}
+
+.harmony-node span {
+	font-size: 0.5rem;
+	font-weight: var(--weight-semibold);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: color-mix(in oklch, var(--color-text) 90%, var(--color-background));
+	white-space: nowrap;
+	padding: 0.12rem 0.3rem;
+	border-radius: 999px;
+	background: color-mix(in oklch, var(--color-surface) 84%, transparent);
+	border: 1px solid color-mix(in oklch, var(--color-border) 80%, transparent);
+}
+
+.theme-harmony-note {
+	margin: 0.5rem 0 0;
+	font-size: 0.75rem;
+	color: var(--color-text-secondary);
+}
+
+.theme-controls {
+	display: grid;
+	gap: 0.875rem;
+}
+
+.harmony-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.5rem;
+}
+
+.harmony-grid button {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.2rem;
+	padding: 0.55rem 0.7rem;
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--color-border);
+	background: color-mix(in oklch, var(--color-surface-hover) 80%, transparent);
+	color: var(--color-text);
+	cursor: pointer;
+	transition: all var(--transition-fast);
+}
+
+.harmony-grid button span {
+	font-size: var(--text-body);
+	font-weight: var(--weight-semibold);
+}
+
+.harmony-grid button small {
+	font-size: 0.65rem;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--color-text-secondary);
+}
+
+.harmony-grid button.active {
+	border-color: color-mix(in oklch, var(--color-primary) 60%, var(--color-border));
+	background: color-mix(in oklch, var(--color-primary) 28%, var(--color-surface));
+	color: var(--color-text);
+}
+
+.theme-slider-grid {
+	display: grid;
+	gap: 0.6rem;
+}
+
+.theme-slider-row {
+	display: grid;
+	grid-template-columns: 4.75rem 1fr 2.2rem;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: var(--text-body);
+	font-weight: var(--weight-medium);
+	color: var(--color-text-secondary);
+}
+
+.theme-range {
+	appearance: none;
+	width: 100%;
+	height: 0.4rem;
+	border-radius: 999px;
+	background: linear-gradient(
+		90deg,
+		color-mix(in oklch, var(--color-surface-hover) 90%, transparent),
+		var(--color-primary)
+	);
+	cursor: pointer;
+}
+
+.theme-range::-webkit-slider-thumb {
+	appearance: none;
+	width: 0.85rem;
+	height: 0.85rem;
+	border-radius: 50%;
+	border: 2px solid color-mix(in oklch, var(--color-text) 70%, transparent);
+	background: var(--color-surface);
+}
+
+.theme-range::-moz-range-thumb {
+	width: 0.85rem;
+	height: 0.85rem;
+	border-radius: 50%;
+	border: 2px solid color-mix(in oklch, var(--color-text) 70%, transparent);
+	background: var(--color-surface);
+}
+
+.theme-range::-moz-range-track {
+	height: 0.4rem;
+	border-radius: 999px;
+	background: linear-gradient(
+		90deg,
+		color-mix(in oklch, var(--color-surface-hover) 90%, transparent),
+		var(--color-primary)
+	);
+	border: 0;
+}
+
+.theme-preview-swatches {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.5rem;
+}
+
+.theme-preview-swatch {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.45rem 0.5rem;
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--color-border);
+	background: color-mix(in oklch, var(--color-surface-hover) 70%, transparent);
+	color: var(--color-text);
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.theme-preview-swatch i {
+	width: 0.95rem;
+	height: 0.95rem;
+	display: inline-block;
+	border-radius: 0.25rem;
+	border: 1px solid color-mix(in oklch, var(--color-text) 35%, transparent);
+	flex-shrink: 0;
+}
+
+.theme-reset-button {
+	padding: 0.55rem 0.8rem;
+	border: 1px dashed color-mix(in oklch, var(--color-primary) 55%, var(--color-border));
+	border-radius: var(--radius-sm);
+	background: color-mix(in oklch, var(--color-primary) 15%, transparent);
+	color: var(--color-text);
+	font-size: var(--text-body);
+	font-weight: var(--weight-semibold);
+	cursor: pointer;
+	transition: all var(--transition-fast);
+}
+
+.theme-reset-button:hover {
+	color: var(--color-text);
+	border-color: var(--color-primary);
+	background: color-mix(in oklch, var(--color-primary) 24%, transparent);
 }
 
 .trim-inputs {
@@ -219,5 +614,41 @@
 	.customizer-options {
 		flex-direction: column;
 		align-items: flex-start;
+	}
+
+	.customizer-tabs {
+		gap: 0.3rem;
+		padding: 0.3rem;
+	}
+
+	.customizer-tabs button {
+		padding: 0.4rem 0.45rem;
+		font-size: 0.62rem;
+	}
+
+	.customizer-accordion-title {
+		font-size: 0.66rem;
+	}
+
+	.customizer-accordion-body {
+		padding: 0.15rem 0.65rem 0.75rem;
+	}
+
+	.theme-harmony-field {
+		width: min(100%, 14.5rem);
+	}
+
+	.harmony-node span {
+		font-size: 0.5rem;
+	}
+
+	.harmony-grid,
+	.theme-preview-swatches {
+		grid-template-columns: 1fr;
+	}
+
+	.theme-slider-row {
+		width: 100%;
+		grid-template-columns: 4.2rem 1fr 2rem;
 	}
 }
