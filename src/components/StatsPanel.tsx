@@ -9,30 +9,38 @@ interface StatsPanelProps {
 	settings: CardSettings
 }
 
-export function StatsPanel({ data, settings }: StatsPanelProps) {
-	const formatDuration = (seconds: number): string => {
-		const hours = Math.floor(seconds / 3600)
-		const minutes = Math.floor((seconds % 3600) / 60)
-		const secs = Math.floor(seconds % 60)
+const formatDuration = (seconds: number): string => {
+	const hours = Math.floor(seconds / 3600)
+	const minutes = Math.floor((seconds % 3600) / 60)
+	const secs = Math.floor(seconds % 60)
 
-		if (hours > 0) {
-			return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-		}
-		return `${minutes}:${secs.toString().padStart(2, "0")}`
+	if (hours > 0) {
+		return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
 	}
+	return `${minutes}:${secs.toString().padStart(2, "0")}`
+}
 
+const formatSubSport = (subSport: string): string => {
+	if (subSport === "virtual_activity") return "Virtual"
+	return subSport
+}
+
+const svgContainerStyle = { position: "absolute" } as const
+const feFloodStyle = { floodColor: "var(--color-primary)" } as const
+
+export function StatsPanel({ data, settings }: StatsPanelProps) {
 	const powerMetrics = useMemo(
-		() => computePowerMetrics(data.records, data.duration, settings.functionalThresholdPower, data.sport),
+		() =>
+			computePowerMetrics(
+				data.records,
+				data.duration,
+				settings.functionalThresholdPower,
+				data.sport,
+			),
 		[data.records, data.duration, settings.functionalThresholdPower, data.sport],
 	)
 
 	const isAdvancedMode = settings.statsDisplayMode === "advanced"
-
-	// Format subSport for display
-	const formatSubSport = (subSport: string): string => {
-		if (subSport === "virtual_activity") return "Virtual"
-		return subSport
-	}
 
 	const classification = powerMetrics.classification
 	const isRunning = data.sport.toLowerCase().includes("running")
@@ -42,10 +50,10 @@ export function StatsPanel({ data, settings }: StatsPanelProps) {
 	return (
 		<div className="stats-panel">
 			{/* SVG filter to render emoji as solid orange silhouette */}
-			<svg width="0" height="0" style={{ position: "absolute" }}>
+			<svg width="0" height="0" style={svgContainerStyle}>
 				<defs>
 					<filter id="emoji-solid-orange">
-						<feFlood style={{ floodColor: "var(--color-primary)" }} result="flood" />
+						<feFlood style={feFloodStyle} result="flood" />
 						<feComposite in="flood" in2="SourceGraphic" operator="in" />
 					</filter>
 				</defs>

@@ -38,7 +38,8 @@ export function applyCleanupAdjustments(
 	const trimEnd = settings.trimEndMinutes ?? Infinity
 
 	let adjusted = records.filter(
-		(record) => record.elapsedMinutes >= settings.trimStartMinutes && record.elapsedMinutes <= trimEnd,
+		(record) =>
+			record.elapsedMinutes >= settings.trimStartMinutes && record.elapsedMinutes <= trimEnd,
 	)
 
 	if (settings.removeZeroPower) {
@@ -52,7 +53,8 @@ export function applyCleanupAdjustments(
 	}
 
 	const changed =
-		adjusted.length !== records.length || adjusted.some((record, index) => record !== records[index])
+		adjusted.length !== records.length ||
+		adjusted.some((record, index) => record !== records[index])
 
 	return {
 		records: adjusted,

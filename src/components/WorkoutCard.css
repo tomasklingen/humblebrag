@@ -19,7 +19,11 @@
 	right: 2.5rem;
 	bottom: 0;
 	height: 1px;
-	background: linear-gradient(90deg, var(--color-accent), color-mix(in oklch, var(--color-surface) 70%, transparent));
+	background: linear-gradient(
+		90deg,
+		var(--color-accent),
+		color-mix(in oklch, var(--color-surface) 70%, transparent)
+	);
 }
 
 .header-brand {

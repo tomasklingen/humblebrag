@@ -1,4 +1,3 @@
-import { useCallback } from "react"
 import "./DualRangeSlider.css"
 
 interface DualRangeSliderProps {
@@ -22,21 +21,15 @@ export function DualRangeSlider({
 	const fillLeft = range > 0 ? ((valueStart - min) / range) * 100 : 0
 	const fillRight = range > 0 ? ((max - valueEnd) / range) * 100 : 0
 
-	const handleStartChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const val = Number(e.target.value)
-			onChange(Math.min(val, valueEnd - step), valueEnd)
-		},
-		[valueEnd, step, onChange],
-	)
+	const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const val = Number(e.target.value)
+		onChange(Math.min(val, valueEnd - step), valueEnd)
+	}
 
-	const handleEndChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const val = Number(e.target.value)
-			onChange(valueStart, Math.max(val, valueStart + step))
-		},
-		[valueStart, step, onChange],
-	)
+	const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const val = Number(e.target.value)
+		onChange(valueStart, Math.max(val, valueStart + step))
+	}
 
 	return (
 		<div className="dual-range-slider">

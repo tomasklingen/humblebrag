@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import type { CardSettings, ThemeHarmony, WorkoutData } from "../types/workout"
 import { DEFAULT_THEME_MODEL, createThemePalette, getHarmonyShift } from "../utils/themePalette"
 import { DualRangeSlider } from "./DualRangeSlider"
@@ -199,27 +199,24 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 		}
 	}
 
-	const applyFieldPointer = useCallback(
-		(event: React.PointerEvent<HTMLDivElement>) => {
-			const bounds = event.currentTarget.getBoundingClientRect()
-			const centerX = bounds.left + bounds.width / 2
-			const centerY = bounds.top + bounds.height / 2
-			const deltaX = event.clientX - centerX
-			const deltaY = event.clientY - centerY
-			const maxRadius = Math.min(bounds.width, bounds.height) / 2
-			const radialDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+	const applyFieldPointer = (event: React.PointerEvent<HTMLDivElement>) => {
+		const bounds = event.currentTarget.getBoundingClientRect()
+		const centerX = bounds.left + bounds.width / 2
+		const centerY = bounds.top + bounds.height / 2
+		const deltaX = event.clientX - centerX
+		const deltaY = event.clientY - centerY
+		const maxRadius = Math.min(bounds.width, bounds.height) / 2
+		const radialDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
-			const hue = ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 90 + 360) % 360
-			const vibrance = Math.round((clamp(radialDistance, 0, maxRadius) / maxRadius) * 100)
+		const hue = ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 90 + 360) % 360
+		const vibrance = Math.round((clamp(radialDistance, 0, maxRadius) / maxRadius) * 100)
 
-			onChange({
-				...settings,
-				themeHue: Math.round(hue),
-				themeVibrance: vibrance,
-			})
-		},
-		[onChange, settings],
-	)
+		onChange({
+			...settings,
+			themeHue: Math.round(hue),
+			themeVibrance: vibrance,
+		})
+	}
 
 	const handleFieldPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
 		activeFieldPointerId.current = event.pointerId
@@ -296,6 +293,36 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 		}, CLOSE_BEFORE_OPEN_MS)
 	}
 
+	const handleToggleGeneral = () => toggleSection("general")
+	const handleToggleChart = () => toggleSection("chart")
+	const handleToggleTheme = () => toggleSection("theme")
+
+	const handleSetBasicMode = () => onChange({ ...settings, statsDisplayMode: "basic" })
+
+	const handleSetAdvancedMode = () => onChange({ ...settings, statsDisplayMode: "advanced" })
+
+	const handleFTPChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		onChange({ ...settings, functionalThresholdPower: Number(e.target.value) || 0 })
+
+	const handleShowPowerRecordsChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		onChange({ ...settings, showPowerRecords: e.target.checked })
+
+	const handleShowHeartRateChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		onChange({ ...settings, showHeartRate: e.target.checked })
+
+	const handleShowTargetPowerChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		onChange({ ...settings, showTargetPower: e.target.checked })
+
+	const handleXAxisTimeMode = () => handleXAxisModeChange("time")
+
+	const handleXAxisDistanceMode = () => handleXAxisModeChange("distance")
+
+	const handleRemoveZeroPowerChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		onChange({ ...settings, removeZeroPower: e.target.checked })
+
+	const handleRemoveZeroHeartRateChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+		onChange({ ...settings, removeZeroHeartRate: e.target.checked })
+
 	useEffect(() => {
 		return () => {
 			if (sectionTransitionTimer.current !== null) {
@@ -316,9 +343,7 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 					type="button"
 					id="customizer-general-title"
 					className={`customizer-section-toggle ${activeSection === "general" ? "active" : ""}`}
-					onClick={() => {
-						toggleSection("general")
-					}}
+					onClick={handleToggleGeneral}
 					aria-expanded={activeSection === "general"}
 				>
 					<span>General</span>
@@ -328,66 +353,55 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 					className={`customizer-section-panel ${activeSection === "general" ? "is-open" : ""}`}
 					aria-hidden={activeSection !== "general"}
 				>
-						<div className="customizer-group">
-							<h5>Stats</h5>
-							<div className="customizer-options">
-								<div className="customizer-segment">
-									<span className="segment-label">Mode</span>
-									<div className="segment-buttons">
-										<button
-											className={settings.statsDisplayMode === "basic" ? "active" : ""}
-											onClick={() => {
-												onChange({ ...settings, statsDisplayMode: "basic" })
-											}}
-										>
-											Basic
-										</button>
-										<button
-											className={settings.statsDisplayMode === "advanced" ? "active" : ""}
-											onClick={() => {
-												onChange({ ...settings, statsDisplayMode: "advanced" })
-											}}
-										>
-											Advanced
-										</button>
-									</div>
+					<div className="customizer-group">
+						<h5>Stats</h5>
+						<div className="customizer-options">
+							<div className="customizer-segment">
+								<span className="segment-label">Mode</span>
+								<div className="segment-buttons">
+									<button
+										className={settings.statsDisplayMode === "basic" ? "active" : ""}
+										onClick={handleSetBasicMode}
+									>
+										Basic
+									</button>
+									<button
+										className={settings.statsDisplayMode === "advanced" ? "active" : ""}
+										onClick={handleSetAdvancedMode}
+									>
+										Advanced
+									</button>
 								</div>
-								<div className="customizer-segment">
-									<span className="segment-label">FTP</span>
-									<input
-										type="number"
-										min={0}
-										step={1}
-										placeholder="0"
-										value={settings.functionalThresholdPower || ""}
-										onChange={(e) => {
-											onChange({
-												...settings,
-												functionalThresholdPower: Number(e.target.value) || 0,
-											})
-										}}
-										className="customizer-input"
-									/>
-									<span className="segment-unit">W</span>
-								</div>
-								{settings.statsDisplayMode === "advanced" ? (
-									<label className="customizer-toggle">
-										<input
-											type="checkbox"
-											checked={settings.showPowerRecords}
-											onChange={(e) => {
-												onChange({ ...settings, showPowerRecords: e.target.checked })
-											}}
-										/>
-										<span className="toggle-track">
-											<span className="toggle-thumb" />
-										</span>
-										<span className="toggle-label">Show Power Records</span>
-									</label>
-								) : null}
 							</div>
+							<div className="customizer-segment">
+								<span className="segment-label">FTP</span>
+								<input
+									type="number"
+									min={0}
+									step={1}
+									placeholder="0"
+									value={settings.functionalThresholdPower || ""}
+									onChange={handleFTPChange}
+									className="customizer-input"
+								/>
+								<span className="segment-unit">W</span>
+							</div>
+							{settings.statsDisplayMode === "advanced" ? (
+								<label className="customizer-toggle">
+									<input
+										type="checkbox"
+										checked={settings.showPowerRecords}
+										onChange={handleShowPowerRecordsChange}
+									/>
+									<span className="toggle-track">
+										<span className="toggle-thumb" />
+									</span>
+									<span className="toggle-label">Show Power Records</span>
+								</label>
+							) : null}
 						</div>
 					</div>
+				</div>
 			</section>
 
 			<section className="customizer-section-block" aria-labelledby="customizer-chart-title">
@@ -395,9 +409,7 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 					type="button"
 					id="customizer-chart-title"
 					className={`customizer-section-toggle ${activeSection === "chart" ? "active" : ""}`}
-					onClick={() => {
-						toggleSection("chart")
-					}}
+					onClick={handleToggleChart}
 					aria-expanded={activeSection === "chart"}
 				>
 					<span>Chart</span>
@@ -407,204 +419,192 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 					className={`customizer-section-panel ${activeSection === "chart" ? "is-open" : ""}`}
 					aria-hidden={activeSection !== "chart"}
 				>
-						<div className="customizer-group">
-							<h5>Display</h5>
-							<div className="customizer-options">
-								{hasHeartRate && (
-									<label className="customizer-toggle">
-										<input
-											type="checkbox"
-											checked={settings.showHeartRate}
-											onChange={(e) => {
-												onChange({ ...settings, showHeartRate: e.target.checked })
-											}}
-										/>
-										<span className="toggle-track">
-											<span className="toggle-thumb" />
-										</span>
-										<span className="toggle-label">Heart Rate Line</span>
-									</label>
-								)}
-								{hasTargetPower && (
-									<label className="customizer-toggle">
-										<input
-											type="checkbox"
-											checked={settings.showTargetPower}
-											onChange={(e) => {
-												onChange({ ...settings, showTargetPower: e.target.checked })
-											}}
-										/>
-										<span className="toggle-track">
-											<span className="toggle-thumb" />
-										</span>
-										<span className="toggle-label">Target Power</span>
-									</label>
-								)}
-							</div>
-						</div>
-
-						<div className="customizer-group">
-							<h5>Axis</h5>
-							<div className="customizer-options">
-								{hasDistance && (
-									<div className="customizer-segment">
-										<span className="segment-label">X-Axis</span>
-										<div className="segment-buttons">
-											<button
-												className={settings.xAxisMode === "time" ? "active" : ""}
-												onClick={() => {
-													handleXAxisModeChange("time")
-												}}
-											>
-												Time
-											</button>
-											<button
-												className={settings.xAxisMode === "distance" ? "active" : ""}
-												onClick={() => {
-													handleXAxisModeChange("distance")
-												}}
-											>
-												Distance
-											</button>
-										</div>
-									</div>
-								)}
-								<div className="customizer-segment">
-									<span className="segment-label">Interval</span>
-									<select
-										className="customizer-select"
-										value={settings.xAxisInterval ?? ""}
-										onChange={handleIntervalChange}
-									>
-										{intervals.map((opt) => (
-											<option key={opt.label} value={opt.value ?? ""}>
-												{opt.label}
-											</option>
-										))}
-									</select>
-								</div>
-							</div>
-						</div>
-
-						<div className="customizer-group">
-							<h5>Style</h5>
-							<div className="customizer-group-body">
-								<label className="theme-slider-row">
-									<span>Graph Lines</span>
-									<input
-										type="range"
-										min={0.6}
-										max={3}
-										step={0.1}
-										value={settings.graphLineThickness}
-										onChange={handleGraphLineThicknessChange}
-										className="theme-range"
-									/>
-									<span>{settings.graphLineThickness.toFixed(1)}x</span>
-								</label>
+					<div className="customizer-group">
+						<h5>Display</h5>
+						<div className="customizer-options">
+							{hasHeartRate && (
 								<label className="customizer-toggle">
 									<input
 										type="checkbox"
-										checked={settings.showXAxisMarkers}
-										onChange={handleShowXAxisMarkersChange}
+										checked={settings.showHeartRate}
+										onChange={handleShowHeartRateChange}
 									/>
 									<span className="toggle-track">
 										<span className="toggle-thumb" />
 									</span>
-									<span className="toggle-label">Show X-Axis Markers</span>
+									<span className="toggle-label">Heart Rate Line</span>
 								</label>
+							)}
+							{hasTargetPower && (
+								<label className="customizer-toggle">
+									<input
+										type="checkbox"
+										checked={settings.showTargetPower}
+										onChange={handleShowTargetPowerChange}
+									/>
+									<span className="toggle-track">
+										<span className="toggle-thumb" />
+									</span>
+									<span className="toggle-label">Target Power</span>
+								</label>
+							)}
+						</div>
+					</div>
+
+					<div className="customizer-group">
+						<h5>Axis</h5>
+						<div className="customizer-options">
+							{hasDistance && (
+								<div className="customizer-segment">
+									<span className="segment-label">X-Axis</span>
+									<div className="segment-buttons">
+										<button
+											className={settings.xAxisMode === "time" ? "active" : ""}
+											onClick={handleXAxisTimeMode}
+										>
+											Time
+										</button>
+										<button
+											className={settings.xAxisMode === "distance" ? "active" : ""}
+											onClick={handleXAxisDistanceMode}
+										>
+											Distance
+										</button>
+									</div>
+								</div>
+							)}
+							<div className="customizer-segment">
+								<span className="segment-label">Interval</span>
+								<select
+									className="customizer-select"
+									value={settings.xAxisInterval ?? ""}
+									onChange={handleIntervalChange}
+								>
+									{intervals.map((opt) => (
+										<option key={opt.label} value={opt.value ?? ""}>
+											{opt.label}
+										</option>
+									))}
+								</select>
 							</div>
 						</div>
+					</div>
 
-						<div className="customizer-group">
-							<h5>Data Cleanup</h5>
-							<div className="customizer-group-body">
-								<label className="theme-slider-row">
-									<span>Smooth Data</span>
-									<input
-										type="range"
-										min={0}
-										max={100}
-										step={1}
-										value={settings.smoothData}
-										onChange={handleSmoothDataChange}
-										className="theme-range"
-									/>
-									<span>{settings.smoothData === 0 ? "off" : `${settings.smoothData}%`}</span>
-								</label>
-								<div className="customizer-options">
-									<label className="customizer-toggle">
+					<div className="customizer-group">
+						<h5>Style</h5>
+						<div className="customizer-group-body">
+							<label className="theme-slider-row">
+								<span>Graph Lines</span>
+								<input
+									type="range"
+									min={0.6}
+									max={3}
+									step={0.1}
+									value={settings.graphLineThickness}
+									onChange={handleGraphLineThicknessChange}
+									className="theme-range"
+								/>
+								<span>{settings.graphLineThickness.toFixed(1)}x</span>
+							</label>
+							<label className="customizer-toggle">
+								<input
+									type="checkbox"
+									checked={settings.showXAxisMarkers}
+									onChange={handleShowXAxisMarkersChange}
+								/>
+								<span className="toggle-track">
+									<span className="toggle-thumb" />
+								</span>
+								<span className="toggle-label">Show X-Axis Markers</span>
+							</label>
+						</div>
+					</div>
+
+					<div className="customizer-group">
+						<h5>Data Cleanup</h5>
+						<div className="customizer-group-body">
+							<label className="theme-slider-row">
+								<span>Smooth Data</span>
+								<input
+									type="range"
+									min={0}
+									max={100}
+									step={1}
+									value={settings.smoothData}
+									onChange={handleSmoothDataChange}
+									className="theme-range"
+								/>
+								<span>{settings.smoothData === 0 ? "off" : `${settings.smoothData}%`}</span>
+							</label>
+							<div className="customizer-options">
+								<label className="customizer-toggle">
 									<input
 										type="checkbox"
 										checked={settings.removeZeroPower}
-										onChange={(e) => {
-											onChange({ ...settings, removeZeroPower: e.target.checked })
-										}}
+										onChange={handleRemoveZeroPowerChange}
 									/>
 									<span className="toggle-track">
 										<span className="toggle-thumb" />
 									</span>
 									<span className="toggle-label">Remove Zero Power</span>
-									</label>
-									{hasHeartRate && (
-										<label className="customizer-toggle">
+								</label>
+								{hasHeartRate && (
+									<label className="customizer-toggle">
 										<input
 											type="checkbox"
 											checked={settings.removeZeroHeartRate}
-											onChange={(e) => {
-												onChange({ ...settings, removeZeroHeartRate: e.target.checked })
-											}}
+											onChange={handleRemoveZeroHeartRateChange}
 										/>
 										<span className="toggle-track">
 											<span className="toggle-thumb" />
 										</span>
 										<span className="toggle-label">Remove Zero Heart Rate</span>
-										</label>
-									)}
-								</div>
-							</div>
-						</div>
-
-						<div className="customizer-group">
-							<h5>Trim Workout</h5>
-							<div className="customizer-group-body">
-								<DualRangeSlider
-									min={0}
-									max={durationMinutes}
-									step={0.5}
-									valueStart={settings.trimStartMinutes}
-									valueEnd={trimEnd}
-									onChange={handleTrimChange}
-								/>
-								<div className="trim-inputs">
-									<label className="trim-field">
-										<span>Start</span>
-										<input
-											type="number"
-											min={0}
-											max={trimEnd - 0.5}
-											step={0.5}
-											value={settings.trimStartMinutes}
-											onChange={handleTrimStartInput}
-										/>
-										<span className="trim-unit">min</span>
 									</label>
-									<label className="trim-field">
-										<span>End</span>
-										<input
-											type="number"
-											min={settings.trimStartMinutes + 0.5}
-											max={durationMinutes}
-											step={0.5}
-											value={trimEnd}
-											onChange={handleTrimEndInput}
-										/>
-										<span className="trim-unit">min</span>
-									</label>
-								</div>
+								)}
 							</div>
 						</div>
 					</div>
+
+					<div className="customizer-group">
+						<h5>Trim Workout</h5>
+						<div className="customizer-group-body">
+							<DualRangeSlider
+								min={0}
+								max={durationMinutes}
+								step={0.5}
+								valueStart={settings.trimStartMinutes}
+								valueEnd={trimEnd}
+								onChange={handleTrimChange}
+							/>
+							<div className="trim-inputs">
+								<label className="trim-field">
+									<span>Start</span>
+									<input
+										type="number"
+										min={0}
+										max={trimEnd - 0.5}
+										step={0.5}
+										value={settings.trimStartMinutes}
+										onChange={handleTrimStartInput}
+									/>
+									<span className="trim-unit">min</span>
+								</label>
+								<label className="trim-field">
+									<span>End</span>
+									<input
+										type="number"
+										min={settings.trimStartMinutes + 0.5}
+										max={durationMinutes}
+										step={0.5}
+										value={trimEnd}
+										onChange={handleTrimEndInput}
+									/>
+									<span className="trim-unit">min</span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
 			</section>
 
 			<section className="customizer-section-block" aria-labelledby="customizer-theme-title">
@@ -612,9 +612,7 @@ export function CardCustomizer({ settings, onChange, data }: CardCustomizerProps
 					type="button"
 					id="customizer-theme-title"
 					className={`customizer-section-toggle ${activeSection === "theme" ? "active" : ""}`}
-					onClick={() => {
-						toggleSection("theme")
-					}}
+					onClick={handleToggleTheme}
 					aria-expanded={activeSection === "theme"}
 				>
 					<span>Theme Lab</span>

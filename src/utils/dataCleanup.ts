@@ -5,9 +5,11 @@ const MAX_WINDOW_HALF = 12
 const MIN_THRESHOLD = 1.05
 const MAX_THRESHOLD = 2.2
 
-const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max)
+const clamp = (value: number, min: number, max: number): number =>
+	Math.min(Math.max(value, min), max)
 
-const toStrengthRatio = (smoothingStrength: number): number => clamp(smoothingStrength, 0, 100) / 100
+const toStrengthRatio = (smoothingStrength: number): number =>
+	clamp(smoothingStrength, 0, 100) / 100
 
 /**
  * Computes the median of an array of numbers.

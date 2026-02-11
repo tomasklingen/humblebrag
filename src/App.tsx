@@ -230,13 +230,7 @@ function App() {
 		}
 
 		return applyCleanupAdjustments(data.records, settings, data.sport)
-	}, [
-		data,
-		settings.removeZeroPower,
-		settings.removeZeroHeartRate,
-		settings.trimStartMinutes,
-		settings.trimEndMinutes,
-	])
+	}, [data, settings])
 
 	const shouldShowAdjustedDataDownload = hasConfiguredDataCleanup(settings)
 
@@ -325,10 +319,20 @@ function App() {
 			return
 		}
 
-		const baseName = file.name.toLowerCase().endsWith(".fit")
-			? file.name.slice(0, -4)
-			: file.name
+		const baseName = file.name.toLowerCase().endsWith(".fit") ? file.name.slice(0, -4) : file.name
 		downloadAdjustedWorkoutCsv(cleanupAdjustmentResult.records, `${baseName}-adjusted.csv`)
+	}
+
+	const handlePopoverToggle = (event: React.ToggleEvent) => {
+		if (!supportsPopoverApi || !isExportPopoverVisible) {
+			return
+		}
+		const popover = event.currentTarget
+		if (popover instanceof HTMLDivElement && !popover.matches(":popover-open")) {
+			setIsExportPopoverVisible(false)
+			setIsExporting(false)
+			clearExportPreviewState()
+		}
 	}
 
 	useEffect(() => {
@@ -366,7 +370,10 @@ function App() {
 				<div className="app-logo">humblebrag</div>
 				<div className="app-header-actions">
 					{shouldShowAdjustedDataDownload ? (
-						<button className="reset-button data-download-button" onClick={handleAdjustedDataDownload}>
+						<button
+							className="reset-button data-download-button"
+							onClick={handleAdjustedDataDownload}
+						>
 							Download Updated Data
 						</button>
 					) : null}
@@ -403,17 +410,7 @@ function App() {
 					ref={exportPopoverRef}
 					className="export-popover"
 					popover="auto"
-					onToggle={(event) => {
-						if (!supportsPopoverApi || !isExportPopoverVisible) {
-							return
-						}
-						const popover = event.currentTarget
-						if (!popover.matches(":popover-open")) {
-							setIsExportPopoverVisible(false)
-							setIsExporting(false)
-							clearExportPreviewState()
-						}
-					}}
+					onToggle={handlePopoverToggle}
 				>
 					<button className="export-popover-close" onClick={closeExportPreview}>
 						Close
@@ -427,7 +424,11 @@ function App() {
 					) : exportedImageUrl ? (
 						<>
 							<div className="export-polaroid">
-								<img className="export-popover-image" src={exportedImageUrl} alt="Exported workout card" />
+								<img
+									className="export-popover-image"
+									src={exportedImageUrl}
+									alt="Exported workout card"
+								/>
 								<p className="export-polaroid-caption">humblebrag</p>
 							</div>
 							<button className="export-popover-download" onClick={handleExportDownload}>

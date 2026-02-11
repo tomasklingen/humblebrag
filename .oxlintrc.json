@@ -3,6 +3,18 @@
 	"env": {
 		"browser": true
 	},
+	"plugins": [
+		"oxc",
+		"react",
+		"eslint",
+		"unicorn",
+		"react-perf",
+		"typescript",
+		"promise",
+		"node",
+		"jsdoc",
+		"vitest"
+	],
 	"categories": {
 		"correctness": "error",
 		"suspicious": "warn",
@@ -11,9 +23,13 @@
 	},
 	"rules": {
 		"max-lines-per-function": "off",
-		"unicorn/consistent-function-scoping": "off",
+		"unicorn/consistent-function-scoping": "warn",
 		"unicorn/no-array-sort": "off",
 		"no-negated-condition": "off",
-		"preserve-caught-error": "off"
+		"preserve-caught-error": "off",
+		"react/react-in-jsx-scope": "off",
+		"react-perf/jsx-no-new-function-as-prop": "off",
+		"react-perf/jsx-no-new-object-as-prop": "off",
+		"react-perf/jsx-no-new-array-as-prop": "off"
 	}
 }

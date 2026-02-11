@@ -11,6 +11,22 @@ export function FileUpload({ onFileSelect, loading, error }: FileUploadProps) {
 	const [dragOver, setDragOver] = useState(false)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
+	const handleFile = (file: File) => {
+		// Validate file extension
+		if (!file.name.toLowerCase().endsWith(".fit")) {
+			alert("Please select a .FIT file")
+			return
+		}
+
+		// Validate file size (< 10MB)
+		if (file.size > 10 * 1024 * 1024) {
+			alert("File size must be less than 10MB")
+			return
+		}
+
+		onFileSelect(file)
+	}
+
 	const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
 		e.preventDefault()
 		setDragOver(true)
@@ -36,22 +52,6 @@ export function FileUpload({ onFileSelect, loading, error }: FileUploadProps) {
 		if (files && files.length > 0) {
 			handleFile(files[0])
 		}
-	}
-
-	const handleFile = (file: File) => {
-		// Validate file extension
-		if (!file.name.toLowerCase().endsWith(".fit")) {
-			alert("Please select a .FIT file")
-			return
-		}
-
-		// Validate file size (< 10MB)
-		if (file.size > 10 * 1024 * 1024) {
-			alert("File size must be less than 10MB")
-			return
-		}
-
-		onFileSelect(file)
 	}
 
 	const handleClick = () => {

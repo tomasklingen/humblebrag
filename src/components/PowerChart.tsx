@@ -96,7 +96,8 @@ export function PowerChart({ records, settings, sport }: PowerChartProps) {
 
 	// Check if data is available AND enabled in settings
 	const hasHeartRate =
-		settings.showHeartRate && metricRecords.some((r) => r.heartRate !== undefined && r.heartRate > 0)
+		settings.showHeartRate &&
+		metricRecords.some((r) => r.heartRate !== undefined && r.heartRate > 0)
 
 	const hasTargetPower =
 		!isRunning &&
@@ -104,13 +105,17 @@ export function PowerChart({ records, settings, sport }: PowerChartProps) {
 		metricRecords.some((r) => r.targetPower !== undefined && r.targetPower > 0)
 
 	// Prepare data for chart
-	const chartData = metricRecords.map((record) => ({
-		time: Number(record.elapsedMinutes.toFixed(1)),
-		distance: record.distance !== undefined ? Number(record.distance.toFixed(2)) : undefined,
-		metric: isRunning ? speedToPace(record.speed) : record.power,
-		targetPower: record.targetPower,
-		...(hasHeartRate ? { heartRate: record.heartRate } : {}),
-	}))
+	const chartData = useMemo(
+		() =>
+			metricRecords.map((record) => ({
+				time: Number(record.elapsedMinutes.toFixed(1)),
+				distance: record.distance !== undefined ? Number(record.distance.toFixed(2)) : undefined,
+				metric: isRunning ? speedToPace(record.speed) : record.power,
+				targetPower: record.targetPower,
+				...(hasHeartRate ? { heartRate: record.heartRate } : {}),
+			})),
+		[metricRecords, isRunning, hasHeartRate],
+	)
 
 	const maxMetric = Math.max(
 		...chartData.map((point) => point.metric ?? 0),
@@ -140,7 +145,10 @@ export function PowerChart({ records, settings, sport }: PowerChartProps) {
 		<div className="chart-container">
 			<div className="chart-header">
 				<div className="chart-header-accent" />
-				<h3>{isRunning ? "Pace (min/km)" : "Power (W)"}{hasHeartRate ? " / Heart Rate (bpm)" : ""}</h3>
+				<h3>
+					{isRunning ? "Pace (min/km)" : "Power (W)"}
+					{hasHeartRate ? " / Heart Rate (bpm)" : ""}
+				</h3>
 			</div>
 			<ResponsiveContainer width="100%" height={300}>
 				<LineChart
@@ -258,8 +266,7 @@ export function PowerChart({ records, settings, sport }: PowerChartProps) {
 							return [`${Math.round(value ?? 0)}W`, label]
 						}}
 						labelFormatter={(label: unknown) => {
-							const labelValue =
-								typeof label === "number" || typeof label === "string" ? label : ""
+							const labelValue = typeof label === "number" || typeof label === "string" ? label : ""
 							return useDistance ? `${labelValue} km` : `${labelValue} min`
 						}}
 					/>

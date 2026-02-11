@@ -103,20 +103,32 @@
 
 .reset-button:hover {
 	color: var(--color-text, #f1f5f9);
-	border-color: color-mix(in oklch, var(--color-text-secondary, #94a3b8) 65%, var(--color-border, #475569));
+	border-color: color-mix(
+		in oklch,
+		var(--color-text-secondary, #94a3b8) 65%,
+		var(--color-border, #475569)
+	);
 	background: color-mix(in oklch, var(--color-surface-hover, #334155) 55%, transparent);
 	transform: translateY(-1px);
 }
 
 .data-download-button {
 	color: color-mix(in oklch, var(--color-primary, #22d3ee) 70%, var(--color-text, #f1f5f9));
-	border-color: color-mix(in oklch, var(--color-primary, #22d3ee) 40%, var(--color-border, #475569));
+	border-color: color-mix(
+		in oklch,
+		var(--color-primary, #22d3ee) 40%,
+		var(--color-border, #475569)
+	);
 	background: color-mix(in oklch, var(--color-primary, #22d3ee) 12%, transparent);
 }
 
 .data-download-button:hover {
 	color: color-mix(in oklch, var(--color-primary, #22d3ee) 85%, var(--color-text, #f1f5f9));
-	border-color: color-mix(in oklch, var(--color-primary, #22d3ee) 62%, var(--color-border, #475569));
+	border-color: color-mix(
+		in oklch,
+		var(--color-primary, #22d3ee) 62%,
+		var(--color-border, #475569)
+	);
 	background: color-mix(in oklch, var(--color-primary, #22d3ee) 20%, transparent);
 }
 
@@ -212,7 +224,9 @@
 	border: none;
 	border-radius: var(--radius-lg);
 	cursor: pointer;
-	transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+	transition:
+		transform var(--transition-fast),
+		box-shadow var(--transition-fast);
 	box-shadow: 0 8px 18px rgb(251 191 36 / 22%);
 }
 
@@ -257,7 +271,8 @@
 	text-align: center;
 	font-size: 0.92rem;
 	color: var(--color-error-light, #fca5a5);
-	border: 1px solid color-mix(in oklch, var(--color-error, #ef4444) 50%, var(--color-border, #475569));
+	border: 1px solid
+		color-mix(in oklch, var(--color-error, #ef4444) 50%, var(--color-border, #475569));
 	border-radius: 12px;
 	background: color-mix(in oklch, var(--color-error, #ef4444) 12%, transparent);
 }
