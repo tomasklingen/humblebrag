@@ -30,7 +30,7 @@
 	background: var(--color-surface, #1e293b);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
 	.app {
 		padding: 0.5rem;
 	}

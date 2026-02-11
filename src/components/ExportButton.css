@@ -11,21 +11,21 @@
 	border-radius: var(--radius-lg);
 	cursor: pointer;
 	transition: all var(--transition-normal);
-	box-shadow: 0 4px 6px rgba(251, 191, 36, 0.2);
-}
-
-.export-button:hover:not(:disabled) {
-	transform: translateY(-2px);
-	box-shadow: 0 6px 12px rgba(251, 191, 36, 0.3);
-}
-
-.export-button:active:not(:disabled) {
-	transform: translateY(0);
+	box-shadow: 0 4px 6px rgb(251 191 36 / 20%);
 }
 
 .export-button:disabled {
 	opacity: 0.7;
 	cursor: not-allowed;
+}
+
+.export-button:hover:not(:disabled) {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 12px rgb(251 191 36 / 30%);
+}
+
+.export-button:active:not(:disabled) {
+	transform: translateY(0);
 }
 
 .export-button.success {
@@ -35,7 +35,7 @@
 .button-spinner {
 	width: 16px;
 	height: 16px;
-	border: 2px solid rgba(15, 23, 42, 0.3);
+	border: 2px solid rgb(15 23 42 / 30%);
 	border-top-color: var(--color-background);
 	border-radius: 50%;
 	animation: spin 0.6s linear infinite;
@@ -47,7 +47,7 @@
 	}
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
 	.export-button {
 		width: 100%;
 		justify-content: center;

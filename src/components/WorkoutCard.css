@@ -48,7 +48,7 @@
 	text-transform: uppercase;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
 	.workout-card {
 		margin: 1rem;
 	}

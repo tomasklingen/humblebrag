@@ -18,23 +18,20 @@
 
 	/* ── Typography ── */
 	--font-system:
-		system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+		system-ui, -apple-system, blinkmacsystemfont, "Segoe UI", roboto, oxygen, ubuntu, cantarell,
 		"Helvetica Neue", sans-serif;
 	--font-display: "Helvetica Neue", "Arial", sans-serif;
-
 	--text-display: 3.5rem;
 	--text-hero: 3rem;
 	--text-title: 2.5rem;
 	--text-stat: 1.25rem;
 	--text-body: 0.8125rem;
 	--text-caption: 0.6875rem;
-
 	--weight-medium: 500;
 	--weight-semibold: 600;
 	--weight-bold: 700;
 	--weight-extrabold: 800;
 	--weight-black: 900;
-
 	--tracking-tight: -0.04em;
 	--tracking-snug: -0.02em;
 	--tracking-normal: 0.05em;
@@ -55,13 +52,11 @@
 	font-family: var(--font-system);
 	line-height: 1.5;
 	font-weight: 400;
-
 	color-scheme: dark;
 	color: var(--color-text);
 	background-color: var(--color-background);
-
 	font-synthesis: none;
-	text-rendering: optimizeLegibility;
+	text-rendering: optimizelegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
