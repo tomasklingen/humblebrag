@@ -8,6 +8,7 @@ import { ThemeLabWidget } from "./components/ThemeLabWidget"
 import { WorkoutCard } from "./components/WorkoutCard"
 import { useFitParser } from "./hooks/useFitParser"
 import type { CardSettings } from "./types/workout"
+import { clearCachedFitFile, loadCachedFitFile, saveCachedFitFile } from "./utils/fileCache"
 import { downloadImage, exportAsImage } from "./utils/imageExport"
 import {
 	applyCleanupAdjustments,
@@ -36,7 +37,7 @@ const defaultSettings: CardSettings = {
 	trimEndMinutes: null,
 	statsDisplayMode: "advanced",
 	showPowerBestEfforts: true,
-	functionalThresholdPower: 0,
+	functionalThresholdPower: 200,
 	graphLineThickness: 1.2,
 	showXAxisMarkers: true,
 	activityTitle: "",
@@ -269,6 +270,27 @@ function App() {
 	}, [settings])
 
 	useEffect(() => {
+		let cancelled = false
+
+		const restoreCachedFit = async () => {
+			try {
+				const cachedFile = await loadCachedFitFile()
+				if (!cancelled && cachedFile) {
+					setFile(cachedFile)
+				}
+			} catch (error) {
+				console.error("Failed to restore cached FIT file:", error)
+			}
+		}
+
+		void restoreCachedFit()
+
+		return () => {
+			cancelled = true
+		}
+	}, [])
+
+	useEffect(() => {
 		if (!data?.sport) {
 			return
 		}
@@ -349,6 +371,18 @@ function App() {
 	const handleReset = () => {
 		closeExportPreview()
 		setFile(null)
+		void clearCachedFitFile()
+	}
+
+	const handleClearSavedFit = () => {
+		closeExportPreview()
+		setFile(null)
+		void clearCachedFitFile()
+	}
+
+	const handleFileSelect = (selectedFile: File) => {
+		setFile(selectedFile)
+		void saveCachedFitFile(selectedFile)
 	}
 
 	const handleDevStorageReset = () => {
@@ -414,7 +448,7 @@ function App() {
 				<header className="app-header app-header-empty">
 					<div className="app-logo">humblebrag</div>
 				</header>
-				<FileUpload onFileSelect={setFile} loading={loading} error={error} />
+				<FileUpload onFileSelect={handleFileSelect} loading={loading} error={error} />
 				{isDevMode ? (
 					<button className="dev-storage-reset-button" onClick={handleDevStorageReset}>
 						Clear Local Storage
@@ -442,6 +476,9 @@ function App() {
 						onClick={handleExport}
 						disabled={isExporting}
 					/>
+					<button className="reset-button app-header-button" onClick={handleClearSavedFit}>
+						Clear Saved FIT
+					</button>
 					<button className="reset-button app-header-button" onClick={handleReset}>
 						Upload New File
 					</button>
