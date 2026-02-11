@@ -22,7 +22,6 @@ import {
 } from "./utils/themePalette"
 
 const STORAGE_KEY = "humblebrag-settings"
-const MAX_ACTIVITY_TITLE_LENGTH = 28
 
 const defaultSettings: CardSettings = {
 	showHeartRate: true,
@@ -163,12 +162,6 @@ function loadSettings(): CardSettings {
 					typeof parsed.showXAxisMarkers === "boolean"
 						? parsed.showXAxisMarkers
 						: defaultSettings.showXAxisMarkers,
-				activityTitle:
-					typeof parsed.activityTitle === "string"
-						? parsed.activityTitle.slice(0, MAX_ACTIVITY_TITLE_LENGTH)
-						: typeof parsed.cardTitle === "string"
-							? parsed.cardTitle.slice(0, MAX_ACTIVITY_TITLE_LENGTH)
-							: defaultSettings.activityTitle,
 			}
 		}
 	} catch (error) {
@@ -198,7 +191,6 @@ function saveSettings(settings: CardSettings): void {
 			functionalThresholdPower: settings.functionalThresholdPower,
 			graphLineThickness: settings.graphLineThickness,
 			showXAxisMarkers: settings.showXAxisMarkers,
-			activityTitle: settings.activityTitle,
 		}
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave))
 	} catch (error) {
