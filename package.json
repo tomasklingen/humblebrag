@@ -5,7 +5,9 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"typecheck": "tsc -b",
+		"build": "npm run typecheck && npm run build:bundle",
+		"build:bundle": "vite build",
 		"lint": "oxlint --type-aware .",
 		"stylelint": "stylelint \"src/**/*.css\"",
 		"format": "oxfmt --write .",

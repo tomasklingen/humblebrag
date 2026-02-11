@@ -1,8 +1,14 @@
 # Humblebrag
 
+[![CI and Deploy Pages](https://github.com/tomasklingen/humblebrag/actions/workflows/ci-pages.yml/badge.svg)](https://github.com/tomasklingen/humblebrag/actions/workflows/ci-pages.yml)
+
 Generate beautiful social media graphics from your fitness data.
 
 <img src="./screenshot.png" alt="Humblebrag app screenshot" width="70%" />
+
+## Live Demo
+
+https://tomasklingen.github.io/humblebrag/
 
 ## What It Does
 
